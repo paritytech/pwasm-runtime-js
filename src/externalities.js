@@ -15,7 +15,6 @@ export default class Externalities {
     }
 
     setStorage(key: H256, value: H256) {
-        // console.log(key.toString());
         this.storage.set(key.toString(), value);
     }
 

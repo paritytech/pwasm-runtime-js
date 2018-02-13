@@ -30,7 +30,7 @@ class Runtime {
         this.u8mem = new Uint8Array(this.memory.buffer);
     }
 
-    viewH256 (ptr: number): H256 {
+    fetchH256 (ptr: number): H256 {
         return H256.view(this.buffer, ptr);
     }
 
@@ -42,11 +42,8 @@ class Runtime {
      * Read from the storage to wasm memory
      */
     storage_read(keyPtr: number, valPtr: number) {
-        let key = this.viewH256(keyPtr);
-        // console.log(key);
-        let value = this.ext.storageAt(key);
+        let value = this.ext.storageAt(this.fetchH256(keyPtr));
         this.writeInto(valPtr, value);
-        let valP = H256.view(this.buffer, keyPtr);
     }
 
     /**
