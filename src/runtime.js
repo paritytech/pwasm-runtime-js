@@ -27,8 +27,8 @@ class Runtime {
         this.args = args;
     }
 
-    at(ptr: number, len: ?number): Uint8Array {
-        return new Uint8Array(this.memory.buffer, ptr, len || undefined);
+    at(ptr: ?number, len: ?number): Uint8Array {
+        return new Uint8Array(this.memory.buffer, ptr || undefined, len || undefined);
     }
 
     fetchH256 (ptr: number): H256 {
@@ -78,31 +78,10 @@ class Runtime {
         this.ext.setStorage(this.fetchH256(keyPtr), this.fetchH256(valPtr));
     }
 
-    /**
-     * Report gas cost with the params passed in wasm stack
-     */
-    gas() {
-
-    }
-
-
-    /**
-     * User panic
-     *
-     * Contract can invoke this when he encounters unrecoverable error.
-     */
-    panic() {
-
-    }
-
-    debug() {
-
-    }
-
-    /**
+        /**
      * Message call
      */
-    ccall() {
+    ccall(gas: number, addrPtr: number, valuePtr: number, inputPtr: number, outputPtr: number) {
 
     }
 
@@ -117,6 +96,26 @@ class Runtime {
      * Static call
      */
     scall() {
+
+    }
+
+    /**
+     * Report gas cost with the params passed in wasm stack
+     */
+    gas() {
+
+    }
+
+    /**
+     * User panic
+     *
+     * Contract can invoke this when he encounters unrecoverable error.
+     */
+    panic() {
+
+    }
+
+    debug() {
 
     }
 
