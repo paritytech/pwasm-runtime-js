@@ -4,10 +4,10 @@ import Externalities from "./externalities";
 import { H256 } from "./types";
 import { readImports } from "./utils";
 
-export async function exec(ext: Externalities, module: ArrayBuffer): Promise<Uint8Array> {
+export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8Array): Promise<Uint8Array> {
     const imports = readImports(module);
     const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
-    const runtime = new Runtime(memory, ext);
+    const runtime = new Runtime(memory, ext, args || Uint8Array.from([]));
     const { instance } = await global.WebAssembly.instantiate(module, {env: importObj(runtime)});
     // Call export
     instance.exports.call();
@@ -16,38 +16,41 @@ export async function exec(ext: Externalities, module: ArrayBuffer): Promise<Uin
 }
 
 class Runtime {
-    buffer: ArrayBuffer;
     memory: Object;
     ext: Externalities;
+    args: Uint8Array;
     result: Uint8Array;
 
-    constructor (memory: Object, ext: Externalities) {
+    constructor (memory: Object, ext: Externalities, args: Uint8Array) {
         this.memory = memory;
         this.ext = ext;
-        this.buffer = this.memory.buffer;
+        this.args = args;
+    }
+
+    at(ptr: number, len: ?number): Uint8Array {
+        return new Uint8Array(this.memory.buffer, ptr, len || undefined);
     }
 
     fetchH256 (ptr: number): H256 {
-        return H256.view(this.buffer, ptr);
+        return H256.view(this.memory.buffer, ptr);
     }
 
     writeInto(ptr: number, value: H256) {
-        value.write(this.buffer, ptr);
+        value.write(this.memory.buffer, ptr);
     }
 
     /**
-     * Read from the storage to wasm memory
+     * Query the length of the input bytes
      */
-    storage_read(keyPtr: number, valPtr: number) {
-        let value = this.ext.storageAt(this.fetchH256(keyPtr));
-        this.writeInto(valPtr, value);
+    input_length(): number {
+        return this.args.byteLength
     }
 
     /**
-     * Write to storage from wasm memory
+     * Write input bytes to the memory location using the passed pointer
      */
-    storage_write(keyPtr: Number, valPtr: Number) {
-
+    fetch_input(inputPtr: number) {
+        this.at(inputPtr).set(this.args);
     }
 
     /**
@@ -57,7 +60,22 @@ class Runtime {
      * the length of the result.
      */
     ret(ptr: number, len: number) {
-        this.result = new Uint8Array(this.buffer, ptr, len);
+        this.result = this.at(ptr, len);
+    }
+
+    /**
+     * Read from the storage to wasm memory
+     */
+    storage_read(keyPtr: number, valPtr: number) {
+        const value = this.ext.storageAt(this.fetchH256(keyPtr));
+        this.writeInto(valPtr, value);
+    }
+
+    /**
+     * Write to storage from wasm memory
+     */
+    storage_write(keyPtr: number, valPtr: number) {
+        this.ext.setStorage(this.fetchH256(keyPtr), this.fetchH256(valPtr));
     }
 
     /**
@@ -67,19 +85,6 @@ class Runtime {
 
     }
 
-    /**
-     * Query the length of the input bytes
-     */
-    input_length() {
-
-    }
-
-    /**
-     * Write input bytes to the memory location using the passed pointer
-     */
-    fetch_input() {
-
-    }
 
     /**
      * User panic
