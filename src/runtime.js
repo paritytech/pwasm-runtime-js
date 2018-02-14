@@ -2,22 +2,20 @@
 
 import Externalities from "./externalities";
 import { H256 } from "./types";
+import { readImports } from "./utils";
 
-/**
- * @param {*} ext
- * @param {*} module
- * @returns WebAssembly.Instance
- */
-export async function exec(ext: Externalities, module: ArrayBuffer): Object {
-    const memory: Object = new global.WebAssembly.Memory({initial: 1, maximum: 16});
+export async function exec(ext: Externalities, module: ArrayBuffer): Promise<Uint8Array> {
+    const imports = readImports(module);
+    const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
     const runtime = new Runtime(memory, ext);
     const { instance } = await global.WebAssembly.instantiate(module, {env: importObj(runtime)});
+    // Call export
     instance.exports.call();
+    // Return result from runtime
     return runtime.result;
 }
 
 class Runtime {
-    u8mem: Uint8Array;
     buffer: ArrayBuffer;
     memory: Object;
     ext: Externalities;
@@ -27,7 +25,6 @@ class Runtime {
         this.memory = memory;
         this.ext = ext;
         this.buffer = this.memory.buffer;
-        this.u8mem = new Uint8Array(this.memory.buffer);
     }
 
     fetchH256 (ptr: number): H256 {
