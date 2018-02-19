@@ -1,5 +1,8 @@
 // @flow
 
+import fs from 'fs';
+import Long from 'long';
+
 import Externalities from "./externalities";
 import { H256 } from "./types";
 import { readImports } from "./utils";
@@ -8,7 +11,7 @@ export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8
     const imports = readImports(module);
     const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
     const runtime = new Runtime(memory, ext, args || Uint8Array.from([]));
-    const { instance } = await global.WebAssembly.instantiate(module, {env: importObj(runtime)});
+    const instance = await runtime.instantiate(module);
     // Call export
     instance.exports.call();
     // Return result from runtime
@@ -20,6 +23,9 @@ class Runtime {
     ext: Externalities;
     args: Uint8Array;
     result: Uint8Array;
+    i64set: Function;
+    i64getHi: Function;
+    i64getLo: Function;
 
     constructor (memory: Object, ext: Externalities, args: Uint8Array) {
         this.memory = memory;
@@ -27,8 +33,57 @@ class Runtime {
         this.args = args;
     }
 
-    at(ptr: ?number, len: ?number): Uint8Array {
+    async instantiate(module: ArrayBuffer): Promise<Object> {
+        const imports = {};
+
+        imports.memory = this.memory;
+        const proxy = fs.readFileSync('/Users/fro/parity/pwasm-runtime/src/proxy.wasm');
+        const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env:
+            {timestamp_i64: this.timestamp_i64.bind(this)}});
+
+            console.log(proxyInstance.exports);
+
+        this.i64set = proxyInstance.exports.i64set;
+        this.i64getHi = proxyInstance.exports.i64getHi;
+        this.i64getLo = proxyInstance.exports.i64getLo;
+
+        imports.timestamp = proxyInstance.exports.timestamp;
+
+        imports.storage_read = this.storage_read.bind(this);
+        imports.storage_write = this.storage_write.bind(this);
+        imports.ret = this.ret.bind(this);
+        imports.gas = this.gas.bind(this);
+        imports.input_length = this.input_length.bind(this);
+        imports.fetch_input = this.fetch_input.bind(this);
+        imports.panic = this.panic.bind(this);
+        imports.debug = this.debug.bind(this);
+        imports.ccall = this.ccall.bind(this);
+        imports.dcall = this.dcall.bind(this);
+        imports.scall = this.scall.bind(this);
+        imports.address = this.address.bind(this);
+        imports.sender = this.sender.bind(this);
+        imports.origin = this.origin.bind(this);
+        imports.value = this.value.bind(this);
+        imports.suicide = this.suicide.bind(this);
+        imports.blockhash = this.blockhash.bind(this);
+        imports.coinbase = this.coinbase.bind(this);
+        imports.difficulty = this.difficulty.bind(this);
+        imports.blocknumber = this.blocknumber.bind(this);
+        imports.gaslimit = this.gaslimit.bind(this);
+        imports.elog = this.elog.bind(this);
+
+        const { instance } = await global.WebAssembly.instantiate(module, {env: imports});
+        return instance;
+    }
+
+    viewAt(ptr: ?number, len: ?number): Uint8Array {
         return new Uint8Array(this.memory.buffer, ptr || undefined, len || undefined);
+    }
+
+    copyAt(ptr: ?number, len: ?number): Uint8Array {
+        const newArray = new Uint8Array(len || 0);
+        newArray.set(new Uint8Array(this.memory.buffer, ptr || undefined, len || undefined));
+        return newArray;
     }
 
     fetchH256 (ptr: number): H256 {
@@ -43,14 +98,14 @@ class Runtime {
      * Query the length of the input bytes
      */
     input_length(): number {
-        return this.args.byteLength
+        return this.args.byteLength;
     }
 
     /**
      * Write input bytes to the memory location using the passed pointer
      */
     fetch_input(inputPtr: number) {
-        this.at(inputPtr).set(this.args);
+        this.viewAt(inputPtr).set(this.args);
     }
 
     /**
@@ -60,7 +115,7 @@ class Runtime {
      * the length of the result.
      */
     ret(ptr: number, len: number) {
-        this.result = this.at(ptr, len);
+        this.result = this.copyAt(ptr, len);
     }
 
     /**
@@ -78,7 +133,7 @@ class Runtime {
         this.ext.setStorage(this.fetchH256(keyPtr), this.fetchH256(valPtr));
     }
 
-        /**
+    /**
      * Message call
      */
     ccall(gas: number, addrPtr: number, valuePtr: number, inputPtr: number, outputPtr: number) {
@@ -132,7 +187,7 @@ class Runtime {
 	 #Arguments:
      * endowment - how much value (in Wei) transfer to the newly created contract
 	 * code_ptr - pointer to the code data
-	 * code_len - lenght of the code data
+	 * code_len - length of the code data
 	 * result_ptr - pointer to write an address of the newly created contract
      */
     create() {
@@ -156,8 +211,8 @@ class Runtime {
     /**
      * Signature: `fn blocknumber() -> i64`
      */
-    blocknumber() {
-
+    blocknumber(): number {
+        return Number.MAX_SAFE_INTEGER
     }
 
     /**
@@ -170,22 +225,25 @@ class Runtime {
     /**
      * Signature: `fn difficulty(dest: *mut u8)`
      */
-    difficulty() {
-
+    difficulty(): number {
+        return Number.MAX_SAFE_INTEGER
     }
 
     /**
      * Signature: `fn gaslimit(dest: *mut u8)`
      */
-    gaslimit() {
-
+    gaslimit(): number {
+        return Number.MAX_SAFE_INTEGER
     }
 
     /**
      * Signature: `timestamp() -> i64`
      */
-    timestamp() {
-
+    timestamp_i64() {
+        const timest = Long.fromString("135342552343534", true);
+        // console.log(timest);
+        this.i64set(timest.getHighBits(), timest.getLowBits());
+        // console.log(0, 1);
     }
 
     /**
@@ -217,7 +275,7 @@ class Runtime {
     }
 }
 
-function importObj(runtime: Runtime): Object {
+function importObj(runtime: Runtime, proxyModule: Object): Object {
     let imports = {};
 
     imports.memory = runtime.memory;
@@ -243,7 +301,7 @@ function importObj(runtime: Runtime): Object {
     imports.difficulty = runtime.difficulty.bind(runtime);
     imports.blocknumber = runtime.blocknumber.bind(runtime);
     imports.gaslimit = runtime.gaslimit.bind(runtime);
-    imports.timestamp = runtime.timestamp.bind(runtime);
+    imports.timestamp = proxyModule.exports.timestamp;
     imports.elog = runtime.elog.bind(runtime);
 
     return imports;

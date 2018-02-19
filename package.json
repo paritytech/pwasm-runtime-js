@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "bn.js": "^4.11.8",
+    "long": "^4.0.0",
     "wasmparser": "^0.5.3"
   }
 }
