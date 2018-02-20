@@ -38,8 +38,10 @@ class Runtime {
 
         imports.memory = this.memory;
         const proxy = fs.readFileSync('/Users/fro/parity/pwasm-runtime/src/proxy.wasm');
-        const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env:
-            {timestamp_i64: this.timestamp_i64.bind(this)}});
+        const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env: {
+            timestamp_u64: this.timestamp_u64.bind(this),
+            blocknumber_u64: this.blocknumber_u64.bind(this),
+        }});
 
             console.log(proxyInstance.exports);
 
@@ -48,6 +50,7 @@ class Runtime {
         this.i64getLo = proxyInstance.exports.i64getLo;
 
         imports.timestamp = proxyInstance.exports.timestamp;
+        imports.blocknumber = proxyInstance.exports.blocknumber;
 
         imports.storage_read = this.storage_read.bind(this);
         imports.storage_write = this.storage_write.bind(this);
@@ -68,7 +71,6 @@ class Runtime {
         imports.blockhash = this.blockhash.bind(this);
         imports.coinbase = this.coinbase.bind(this);
         imports.difficulty = this.difficulty.bind(this);
-        imports.blocknumber = this.blocknumber.bind(this);
         imports.gaslimit = this.gaslimit.bind(this);
         imports.elog = this.elog.bind(this);
 
@@ -208,12 +210,6 @@ class Runtime {
     blockhash() {
 
     }
-    /**
-     * Signature: `fn blocknumber() -> i64`
-     */
-    blocknumber(): number {
-        return Number.MAX_SAFE_INTEGER
-    }
 
     /**
      * Signature: `fn coinbase(dest: *mut u8)`
@@ -237,13 +233,19 @@ class Runtime {
     }
 
     /**
+     * Signature: `fn blocknumber() -> i64`
+     */
+    blocknumber_u64() {
+        const timest = Long.fromString("1111111111243434344", true);
+        this.i64set(timest.getHighBits(), timest.getLowBits());
+    }
+
+    /**
      * Signature: `timestamp() -> i64`
      */
-    timestamp_i64() {
+    timestamp_u64() {
         const timest = Long.fromString("135342552343534", true);
-        // console.log(timest);
         this.i64set(timest.getHighBits(), timest.getLowBits());
-        // console.log(0, 1);
     }
 
     /**

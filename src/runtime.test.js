@@ -10,7 +10,7 @@ test('storage_read', async () => {
     let ext = new Externalities();
 
     ext.setStorage(
-        H256.fromString("0x010000000000000000000000000000000000000000000000000000000000000"),
+        H256.fromString("0x0100000000000000000000000000000000000000000000000000000000000000"),
         H256.fromString("0xaf0fa234a6af46afa23faf23bcbc1c1cb4bcb7bcbe7e7e7ee3ee2edddddddddd"));
 
     let result = await exec(ext, wasm);
@@ -31,8 +31,10 @@ test('externs', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/externs.wasm');
     let ext = new Externalities();
     let result = await exec(ext, wasm);
-    let result_u64 = Long.fromBytesLE(result);
-    console.log(result_u64.toString());
+    let timestamp = Long.fromBytesLE(result.slice(0, 8));
+    let blocknumber = Long.fromBytesLE(result.slice(8, 16));
+    console.log(timestamp.toString());
+    console.log(blocknumber.toString());
     // expect(new H256(result))
     //     .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
 });
