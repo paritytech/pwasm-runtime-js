@@ -23,9 +23,8 @@ class Runtime {
     ext: Externalities;
     args: Uint8Array;
     result: Uint8Array;
-    i64set: Function;
+    i64setHi: Function;
     i64getHi: Function;
-    i64getLo: Function;
 
     constructor (memory: Object, ext: Externalities, args: Uint8Array) {
         this.memory = memory;
@@ -43,11 +42,8 @@ class Runtime {
             blocknumber_u64: this.blocknumber_u64.bind(this),
         }});
 
-            console.log(proxyInstance.exports);
-
-        this.i64set = proxyInstance.exports.i64set;
+        this.i64setHi = proxyInstance.exports.i64setHi;
         this.i64getHi = proxyInstance.exports.i64getHi;
-        this.i64getLo = proxyInstance.exports.i64getLo;
 
         imports.timestamp = proxyInstance.exports.timestamp;
         imports.blocknumber = proxyInstance.exports.blocknumber;
@@ -235,17 +231,19 @@ class Runtime {
     /**
      * Signature: `fn blocknumber() -> i64`
      */
-    blocknumber_u64() {
+    blocknumber_u64(): number {
         const timest = Long.fromString("1111111111243434344", true);
-        this.i64set(timest.getHighBits(), timest.getLowBits());
+        this.i64setHi(timest.getHighBits());
+        return timest.getLowBits();
     }
 
     /**
      * Signature: `timestamp() -> i64`
      */
-    timestamp_u64() {
+    timestamp_u64(): number {
         const timest = Long.fromString("135342552343534", true);
-        this.i64set(timest.getHighBits(), timest.getLowBits());
+        this.i64setHi(timest.getHighBits());
+        return timest.getLowBits();
     }
 
     /**
