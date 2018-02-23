@@ -232,18 +232,18 @@ class Runtime {
      * Signature: `fn blocknumber() -> i64`
      */
     blocknumber_u64(): number {
-        const timest = Long.fromString("1111111111243434344", true);
-        this.i64setHi(timest.getHighBits());
-        return timest.getLowBits();
+        const { blocknumber } = this.ext.getEnvInfo();
+        this.i64setHi(blocknumber.getHighBits());
+        return blocknumber.getLowBits();
     }
 
     /**
      * Signature: `timestamp() -> i64`
      */
     timestamp_u64(): number {
-        const timest = Long.fromString("135342552343534", true);
-        this.i64setHi(timest.getHighBits());
-        return timest.getLowBits();
+        const { timestamp } = this.ext.getEnvInfo();
+        this.i64setHi(timestamp.getHighBits());
+        return timestamp.getLowBits();
     }
 
     /**

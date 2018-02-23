@@ -29,12 +29,16 @@ test('keccak', async () => {
 
 test('externs', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/externs.wasm');
-    let ext = new Externalities();
+    let ext = new Externalities({
+        envInfo: {
+            blocknumber: Long.fromString("353464564536345623"),
+            timestamp: Long.fromString("666666666663322768")
+        }
+    });
+
     let result = await exec(ext, wasm);
-    let timestamp = Long.fromBytesLE(result.slice(0, 8));
-    let blocknumber = Long.fromBytesLE(result.slice(8, 16));
-    console.log(timestamp.toString());
-    console.log(blocknumber.toString());
+    expect(Long.fromBytesLE(result.slice(0, 8))).toEqual(Long.fromString("666666666663322768"));
+    expect(Long.fromBytesLE(result.slice(8, 16))).toEqual(Long.fromString("353464564536345623"));
     // expect(new H256(result))
     //     .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
 });

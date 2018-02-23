@@ -1,13 +1,16 @@
 // @flow
 
-import { H256 } from "./types";
+import BigNumber from "bn.js";
+import { H256, EnvInfo } from "./types";
 
 export default class Externalities {
 
     storage: Map<string, H256>;
+    envInfo: EnvInfo;
 
-    constructor() {
+    constructor(params : { envInfo: ?EnvInfo } = { envInfo: null}) {
         this.storage = new Map();
+        this.envInfo = params.envInfo || EnvInfo.default();
     }
 
     storageAt(key: H256): H256 {
@@ -56,8 +59,8 @@ export default class Externalities {
         throw "not impl";
     }
 
-    envInfo() {
-        throw "not impl";
+    getEnvInfo(): EnvInfo {
+        return this.envInfo;
     }
 
     depth() {

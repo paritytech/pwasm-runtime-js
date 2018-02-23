@@ -1,5 +1,6 @@
 // @flow
 import BigNumber from "bn.js";
+import Long from "long";
 
 export const CALL_TYPES = {
     None: (0:0),
@@ -29,6 +30,29 @@ export class ActionParams {
     value: BigNumber;
     callType: CallType;
     params_type: ParamsType;
+}
+
+export class EnvInfo {
+    blocknumber: Long; // blocknumber
+    timestamp: Long;
+    author: string;
+    difficulty: BigNumber;
+    gasLimit: BigNumber;
+    lastHashes: Array<string>;
+    gasUsed: BigNumber;
+
+
+    static default() {
+        const env = new EnvInfo();
+        env.blocknumber = Long.fromNumber(0);
+        env.timestamp = Long.fromNumber(0);
+        env.author = "";
+        env.difficulty = new BigNumber(0);
+        env.gasLimit = new BigNumber(0);
+        env.gasUsed = new BigNumber(0);
+        env.lastHashes = [];
+        return env;
+    }
 }
 
 export class H256 {
