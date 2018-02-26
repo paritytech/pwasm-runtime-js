@@ -19,10 +19,10 @@ type CallType = $Values<typeof CALL_TYPES>;
 type ParamsType = $Values<typeof PARAMS_TYPES>;
 
 export class ActionParams {
-    code_address: string;
-    sender: string;
-    origin: string;
-    code_hash: ?string;
+    code_address: Address;
+    sender: Address;
+    origin: Address;
+    code_hash: ?H256;
     code: ?Uint8Array;
     data: ?Uint8Array;
     gas: BigNumber;
@@ -33,12 +33,12 @@ export class ActionParams {
 }
 
 export class EnvInfo {
-    blocknumber: Long; // blocknumber
+    blocknumber: Long;
     timestamp: Long;
-    author: string;
+    author: Address;
     difficulty: BigNumber;
     gasLimit: BigNumber;
-    lastHashes: Array<string>;
+    lastHashes: Array<H256>;
     gasUsed: BigNumber;
 
 
@@ -46,7 +46,7 @@ export class EnvInfo {
         const env = new EnvInfo();
         env.blocknumber = Long.fromNumber(0);
         env.timestamp = Long.fromNumber(0);
-        env.author = "";
+        env.author = new Address(new Uint8Array([]));
         env.difficulty = new BigNumber(0);
         env.gasLimit = new BigNumber(0);
         env.gasUsed = new BigNumber(0);
@@ -55,7 +55,7 @@ export class EnvInfo {
     }
 }
 
-export class H256 {
+export class FixedArray {
     bytes: Uint8Array;
 
     constructor(bytes: Uint8Array) {
@@ -71,11 +71,27 @@ export class H256 {
         return "0x" + bytesToHex(this.bytes);
     }
 
-    static fromString(hex: string): H256 {
+    static fromString(hex: string): FixedArray {
+        return new FixedArray(Uint8Array.from(hexToBytes(hex)));
+    }
+
+    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
+        const copied = new Uint8Array(buffer.slice(offset, offset + 32));
+        return new FixedArray(copied);
+    }
+
+    static view(buffer: ArrayBuffer, offset: number): FixedArray {
+        const view = new Uint8Array(buffer, offset, 32);
+        return new FixedArray(view);
+    }
+}
+
+export class H256 extends FixedArray {
+    static fromString(hex: string): FixedArray {
         return new H256(Uint8Array.from(hexToBytes(hex)));
     }
 
-    static copy(buffer: ArrayBuffer, offset: number): H256 {
+    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
         const copied = new Uint8Array(buffer.slice(offset, offset + 32));
         return new H256(copied);
     }
@@ -84,7 +100,23 @@ export class H256 {
         const view = new Uint8Array(buffer, offset, 32);
         return new H256(view);
     }
+}
 
+export class Address extends FixedArray {
+
+    static fromString(hex: string): FixedArray {
+        return new Address(Uint8Array.from(hexToBytes(hex)));
+    }
+
+    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
+        const copied = new Uint8Array(buffer.slice(offset, offset + 20));
+        return new Address(copied);
+    }
+
+    static view(buffer: ArrayBuffer, offset: number): FixedArray {
+        const view = new Uint8Array(buffer, offset, 20);
+        return new Address(view);
+    }
 }
 
 function bytesToHex(bytes: Uint8Array): string {

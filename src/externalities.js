@@ -8,9 +8,9 @@ export default class Externalities {
     storage: Map<string, H256>;
     envInfo: EnvInfo;
 
-    constructor(params : { envInfo: ?EnvInfo } = { envInfo: null}) {
+    constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
         this.storage = new Map();
-        this.envInfo = params.envInfo || EnvInfo.default();
+        this.envInfo = params.envInfo;
     }
 
     storageAt(key: H256): H256 {

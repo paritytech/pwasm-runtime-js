@@ -39,6 +39,7 @@ test('externs', async () => {
     let result = await exec(ext, wasm);
     expect(Long.fromBytesLE(result.slice(0, 8))).toEqual(Long.fromString("666666666663322768"));
     expect(Long.fromBytesLE(result.slice(8, 16))).toEqual(Long.fromString("353464564536345623"));
+
     // expect(new H256(result))
     //     .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
 });

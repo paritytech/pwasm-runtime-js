@@ -4,7 +4,7 @@ import fs from 'fs';
 import Long from 'long';
 
 import Externalities from "./externalities";
-import { H256 } from "./types";
+import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
 
 export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8Array): Promise<Uint8Array> {
@@ -88,7 +88,15 @@ class Runtime {
         return H256.view(this.memory.buffer, ptr);
     }
 
-    writeInto(ptr: number, value: H256) {
+    writeInto(ptr: number, value: FixedArray) {
+        value.write(this.memory.buffer, ptr);
+    }
+
+    writeBigNumInto(ptr: number, value: FixedArray) {
+        value.write(this.memory.buffer, ptr);
+    }
+
+    writeAddressInto(ptr: number, value: H256) {
         value.write(this.memory.buffer, ptr);
     }
 
@@ -210,8 +218,8 @@ class Runtime {
     /**
      * Signature: `fn coinbase(dest: *mut u8)`
      */
-    coinbase() {
-
+    coinbase(dest: number) {
+        this.writeInto(dest, this.ext.getEnvInfo().author);
     }
 
     /**
@@ -225,7 +233,7 @@ class Runtime {
      * Signature: `fn gaslimit(dest: *mut u8)`
      */
     gaslimit(): number {
-        return Number.MAX_SAFE_INTEGER
+        this.writeInto(dest, this.ext.getEnvInfo().author);
     }
 
     /**
@@ -273,36 +281,4 @@ class Runtime {
     elog() {
 
     }
-}
-
-function importObj(runtime: Runtime, proxyModule: Object): Object {
-    let imports = {};
-
-    imports.memory = runtime.memory;
-
-    imports.storage_read = runtime.storage_read.bind(runtime);
-    imports.storage_write = runtime.storage_write.bind(runtime);
-    imports.ret = runtime.ret.bind(runtime);
-    imports.gas = runtime.gas.bind(runtime);
-    imports.input_length = runtime.input_length.bind(runtime);
-    imports.fetch_input = runtime.fetch_input.bind(runtime);
-    imports.panic = runtime.panic.bind(runtime);
-    imports.debug = runtime.debug.bind(runtime);
-    imports.ccall = runtime.ccall.bind(runtime);
-    imports.dcall = runtime.dcall.bind(runtime);
-    imports.scall = runtime.scall.bind(runtime);
-    imports.address = runtime.address.bind(runtime);
-    imports.sender = runtime.sender.bind(runtime);
-    imports.origin = runtime.origin.bind(runtime);
-    imports.value = runtime.value.bind(runtime);
-    imports.suicide = runtime.suicide.bind(runtime);
-    imports.blockhash = runtime.blockhash.bind(runtime);
-    imports.coinbase = runtime.coinbase.bind(runtime);
-    imports.difficulty = runtime.difficulty.bind(runtime);
-    imports.blocknumber = runtime.blocknumber.bind(runtime);
-    imports.gaslimit = runtime.gaslimit.bind(runtime);
-    imports.timestamp = proxyModule.exports.timestamp;
-    imports.elog = runtime.elog.bind(runtime);
-
-    return imports;
 }
