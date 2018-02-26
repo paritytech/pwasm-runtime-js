@@ -7,6 +7,7 @@ export default class Externalities {
 
     storage: Map<string, H256>;
     envInfo: EnvInfo;
+    blockhashes: Map<number, H256>;
 
     constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
         this.storage = new Map();

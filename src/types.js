@@ -41,7 +41,6 @@ export class EnvInfo {
     lastHashes: Array<H256>;
     gasUsed: BigNumber;
 
-
     static default() {
         const env = new EnvInfo();
         env.blocknumber = Long.fromNumber(0);
@@ -91,7 +90,7 @@ export class H256 extends FixedArray {
         return new H256(Uint8Array.from(hexToBytes(hex)));
     }
 
-    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
+    static copy(buffer: ArrayBuffer, offset: number): H256 {
         const copied = new Uint8Array(buffer.slice(offset, offset + 32));
         return new H256(copied);
     }
@@ -104,16 +103,16 @@ export class H256 extends FixedArray {
 
 export class Address extends FixedArray {
 
-    static fromString(hex: string): FixedArray {
+    static fromString(hex: string): Address {
         return new Address(Uint8Array.from(hexToBytes(hex)));
     }
 
-    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
+    static copy(buffer: ArrayBuffer, offset: number): Address {
         const copied = new Uint8Array(buffer.slice(offset, offset + 20));
         return new Address(copied);
     }
 
-    static view(buffer: ArrayBuffer, offset: number): FixedArray {
+    static view(buffer: ArrayBuffer, offset: number): Address {
         const view = new Uint8Array(buffer, offset, 20);
         return new Address(view);
     }

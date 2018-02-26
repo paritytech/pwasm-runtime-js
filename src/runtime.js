@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import Long from 'long';
+import BigNumber from 'bn.js';
 
 import Externalities from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
@@ -18,18 +19,28 @@ export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8
     return runtime.result;
 }
 
+class RuntimeContext {
+    address: Address;
+	sender: Address;
+	origin: Address;
+	code_address: Address;
+	value: BigNumber;
+}
+
 class Runtime {
     memory: Object;
     ext: Externalities;
     args: Uint8Array;
+    context: RuntimeContext;
     result: Uint8Array;
     i64setHi: Function;
     i64getHi: Function;
 
-    constructor (memory: Object, ext: Externalities, args: Uint8Array) {
+    constructor (memory: Object, ext: Externalities, args: Uint8Array, context: RuntimeContext) {
         this.memory = memory;
         this.ext = ext;
         this.args = args;
+        this.context = context;
     }
 
     async instantiate(module: ArrayBuffer): Promise<Object> {
@@ -84,7 +95,11 @@ class Runtime {
         return newArray;
     }
 
-    fetchH256 (ptr: number): H256 {
+    viewAddressAt (ptr: number): Address {
+        return Address.view(this.memory.buffer, ptr);
+    }
+
+    viewH256At (ptr: number): H256 {
         return H256.view(this.memory.buffer, ptr);
     }
 
@@ -92,8 +107,9 @@ class Runtime {
         value.write(this.memory.buffer, ptr);
     }
 
-    writeBigNumInto(ptr: number, value: FixedArray) {
-        value.write(this.memory.buffer, ptr);
+    writeU256Into(ptr: number, value: BigNumber) {
+        const into = new Uint8Array(this.memory.buffer, ptr, 32);
+        into.set(value.toArrayLike(Uint8Array, "be", 32));
     }
 
     writeAddressInto(ptr: number, value: H256) {
@@ -128,7 +144,7 @@ class Runtime {
      * Read from the storage to wasm memory
      */
     storage_read(keyPtr: number, valPtr: number) {
-        const value = this.ext.storageAt(this.fetchH256(keyPtr));
+        const value = this.ext.storageAt(this.viewH256At(keyPtr));
         this.writeInto(valPtr, value);
     }
 
@@ -136,7 +152,7 @@ class Runtime {
      * Write to storage from wasm memory
      */
     storage_write(keyPtr: number, valPtr: number) {
-        this.ext.setStorage(this.fetchH256(keyPtr), this.fetchH256(valPtr));
+        this.ext.setStorage(this.viewH256At(keyPtr), this.viewH256At(valPtr));
     }
 
     /**
@@ -183,8 +199,8 @@ class Runtime {
     /**
      * Returns value (in Wei) passed to contract
      */
-    value() {
-
+    value(dest) {
+        this.writeU256Into(dest, this.context.value);
     }
 
     /**
@@ -203,8 +219,8 @@ class Runtime {
     /**
      * Pass suicide to state runtime
      */
-    suicide() {
-
+    suicide(addrPtr: number) {
+        this.ext.suicide(this.viewAddressAt(addrPtr));
     }
 
     /**
@@ -225,15 +241,15 @@ class Runtime {
     /**
      * Signature: `fn difficulty(dest: *mut u8)`
      */
-    difficulty(): number {
-        return Number.MAX_SAFE_INTEGER
+    difficulty(dest) {
+        this.writeU256Into(dest, this.ext.getEnvInfo().difficulty);
     }
 
     /**
      * Signature: `fn gaslimit(dest: *mut u8)`
      */
-    gaslimit(): number {
-        this.writeInto(dest, this.ext.getEnvInfo().author);
+    gaslimit(dest) {
+        this.writeU256Into(dest, this.ext.getEnvInfo().gasLimit);
     }
 
     /**
@@ -257,22 +273,22 @@ class Runtime {
     /**
      * Signature: `fn address(dest: *mut u8)`
      */
-    address() {
-
+    address(dest) {
+        this.writeInto(dest, this.context.address);
     }
 
     /**
      * Signature: `sender(dest: *mut u8)`
      */
-    sender() {
-
+    sender(dest) {
+        this.writeInto(dest, this.context.sender);
     }
 
     /**
      * Signature: `origin(dest: *mut u8)`
      */
-    origin() {
-
+    origin(dest) {
+        this.writeInto(dest, this.context.origin);
     }
 
     /**
