@@ -33,6 +33,8 @@ export default class Externalities {
     constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
         this.storage = new Map();
         this.envInfo = params.envInfo;
+        this.calls = [];
+        this.creates = [];
     }
 
     storageAt(key: H256): H256 {
@@ -64,7 +66,7 @@ export default class Externalities {
         this.creates.push({gas, value, code, address});
     }
     call(gas: Long, senderAddress: Address, receiveAddress: Address, value: BigNumber,
-            data: Uint8Array, codeAddress: Address, _output: Uint8Array, callType: CallType) {
+            data: Uint8Array, codeAddress: Address, output: Uint8Array, callType: CallType) {
         this.calls.push({gas, senderAddress, receiveAddress, value, data, codeAddress, callType});
     }
     extcode(address) {

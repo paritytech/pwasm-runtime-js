@@ -5,6 +5,16 @@ import { exec, RuntimeContext } from './runtime';
 import Externalities from './externalities';
 import { H256 } from './types';
 
+test('ccall', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/call.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.calls.length).toBe(1);
+    let call = ext.calls[0];
+    expect(call.value.toString()).toEqual(new Long(1000000000).toString());
+});
+
 test('storage_read', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/storage_read.wasm');
     let ext = new Externalities();
@@ -25,10 +35,6 @@ test('keccak', async () => {
     let result = await exec(ext, wasm, RuntimeContext.default(), bytes);
     expect(new H256(result))
         .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
-});
-
-test('call', async () => {
-
 });
 
 test('externs', async () => {

@@ -7,6 +7,7 @@ import BigNumber from 'bn.js';
 import Externalities from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
+import type { CALL_TYPES } from "./types";
 
 export async function exec(ext: Externalities, module: ArrayBuffer, context: RuntimeContext, args: ?Uint8Array): Promise<Uint8Array> {
     const imports = readImports(module);
@@ -107,8 +108,12 @@ class Runtime {
 
     copyAt(ptr: ?number, len: ?number): Uint8Array {
         const newArray = new Uint8Array(len || 0);
-        newArray.set(new Uint8Array(this.memory.buffer, ptr || undefined, len || undefined));
+        newArray.set(new Uint8Array(this.memory.buffer, ptr || undefined, len || 0));
         return newArray;
+    }
+
+    copyAddressAt (ptr: number): Address {
+        return Address.copy(this.memory.buffer, ptr);
     }
 
     viewAddressAt (ptr: number): Address {
@@ -126,6 +131,10 @@ class Runtime {
     writeU256Into(ptr: number, value: BigNumber) {
         const into = new Uint8Array(this.memory.buffer, ptr, 32);
         into.set(value.toArrayLike(Uint8Array, "be", 32));
+    }
+
+    copyU256At(ptr: number): BigNumber {
+        return new BigNumber(this.copyAt(ptr, 32), 10, 'be');
     }
 
     writeAddressInto(ptr: number, value: H256) {
@@ -174,8 +183,16 @@ class Runtime {
     /**
      * Message call
      */
-    call_u64(u64GasHi: number, u64GasLo: number, addrPtr: number, valuePtr: number, inputPtr: number, outputPtr: number) {
-
+    call_u64(u64GasHi: number, u64GasLo: number, addrPtr: number, valuePtr: number, inputPtr: number, inputLen: number, outputPtr: number, outputLen: number) {
+        this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
+            this.context.address,
+            this.copyAddressAt(addrPtr),
+            this.copyU256At(valuePtr),
+            this.copyAt(inputPtr, inputLen),
+            this.copyAddressAt(addrPtr),
+            new Uint8Array([]),
+            1
+        );
     }
 
     /**
