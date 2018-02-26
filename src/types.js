@@ -15,7 +15,7 @@ export const PARAMS_TYPES = {
     Separate: (1:1),
 };
 
-type CallType = $Values<typeof CALL_TYPES>;
+export type CallType = $Values<typeof CALL_TYPES>;
 type ParamsType = $Values<typeof PARAMS_TYPES>;
 
 export class ActionParams {

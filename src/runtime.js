@@ -8,10 +8,10 @@ import Externalities from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
 
-export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8Array): Promise<Uint8Array> {
+export async function exec(ext: Externalities, module: ArrayBuffer, context: RuntimeContext, args: ?Uint8Array): Promise<Uint8Array> {
     const imports = readImports(module);
     const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
-    const runtime = new Runtime(memory, ext, args || Uint8Array.from([]));
+    const runtime = new Runtime(memory, ext, context, args || Uint8Array.from([]));
     const instance = await runtime.instantiate(module);
     // Call export
     instance.exports.call();
@@ -19,12 +19,27 @@ export async function exec(ext: Externalities, module: ArrayBuffer, args: ?Uint8
     return runtime.result;
 }
 
-class RuntimeContext {
+export class RuntimeContext {
     address: Address;
 	sender: Address;
 	origin: Address;
 	code_address: Address;
-	value: BigNumber;
+    value: BigNumber;
+
+    constructor(address: Address, sender: Address, origin: Address, code_address: Address, value: BigNumber) {
+        this.address = address;
+        this.sender = sender;
+        this.origin = origin;
+        this.code_address = code_address;
+        this.value = value;
+    }
+
+    static default() {
+        return new RuntimeContext(new Address(new Uint8Array([])),
+            new Address(new Uint8Array([])),
+            new Address(new Uint8Array([])),
+            new BigNumber(0))
+    }
 }
 
 class Runtime {
@@ -36,7 +51,7 @@ class Runtime {
     i64setHi: Function;
     i64getHi: Function;
 
-    constructor (memory: Object, ext: Externalities, args: Uint8Array, context: RuntimeContext) {
+    constructor (memory: Object, ext: Externalities, context: RuntimeContext, args: Uint8Array) {
         this.memory = memory;
         this.ext = ext;
         this.args = args;
@@ -51,6 +66,7 @@ class Runtime {
         const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env: {
             timestamp_u64: this.timestamp_u64.bind(this),
             blocknumber_u64: this.blocknumber_u64.bind(this),
+            call_u64: this.call_u64.bind(this),
         }});
 
         this.i64setHi = proxyInstance.exports.i64setHi;
@@ -58,6 +74,7 @@ class Runtime {
 
         imports.timestamp = proxyInstance.exports.timestamp;
         imports.blocknumber = proxyInstance.exports.blocknumber;
+        imports.ccall = proxyInstance.exports.ccall;
 
         imports.storage_read = this.storage_read.bind(this);
         imports.storage_write = this.storage_write.bind(this);
@@ -67,7 +84,6 @@ class Runtime {
         imports.fetch_input = this.fetch_input.bind(this);
         imports.panic = this.panic.bind(this);
         imports.debug = this.debug.bind(this);
-        imports.ccall = this.ccall.bind(this);
         imports.dcall = this.dcall.bind(this);
         imports.scall = this.scall.bind(this);
         imports.address = this.address.bind(this);
@@ -158,7 +174,7 @@ class Runtime {
     /**
      * Message call
      */
-    ccall(gas: number, addrPtr: number, valuePtr: number, inputPtr: number, outputPtr: number) {
+    call_u64(u64GasHi: number, u64GasLo: number, addrPtr: number, valuePtr: number, inputPtr: number, outputPtr: number) {
 
     }
 

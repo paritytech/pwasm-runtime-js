@@ -1,13 +1,34 @@
 // @flow
 
 import BigNumber from "bn.js";
-import { H256, EnvInfo } from "./types";
+import Long from "long";
+import { H256, EnvInfo, Address } from "./types";
+import type { CallType } from "./types";
+
+type FakeCreate = {
+	gas: Long;
+	value: BigNumber;
+	code: Uint8Array;
+	address: Address;
+}
+
+type FakeCall = {
+    callType: CallType;
+	gas: Long;
+	senderAddress: Address;
+	receiveAddress: Address;
+	value: BigNumber;
+	data: Uint8Array;
+	codeAddress: Address;
+}
 
 export default class Externalities {
 
     storage: Map<string, H256>;
     envInfo: EnvInfo;
     blockhashes: Map<number, H256>;
+    calls: Array<FakeCall>;
+    creates: Array<FakeCreate>;
 
     constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
         this.storage = new Map();
@@ -39,11 +60,12 @@ export default class Externalities {
     blockhash(number) {
         throw "not impl";
     }
-    create(gas, value, code, address) {
-        throw "not impl";
+    create(gas: Long, value: BigNumber, code: Uint8Array, address: Address) {
+        this.creates.push({gas, value, code, address});
     }
-    call(gas, senderAddress, receiveAddress, value, data, codeAddress, output, callType) {
-        throw "not impl";
+    call(gas: Long, senderAddress: Address, receiveAddress: Address, value: BigNumber,
+            data: Uint8Array, codeAddress: Address, _output: Uint8Array, callType: CallType) {
+        this.calls.push({gas, senderAddress, receiveAddress, value, data, codeAddress, callType});
     }
     extcode(address) {
         throw "not impl";
