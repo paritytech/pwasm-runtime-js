@@ -17,7 +17,7 @@ type FakeCall = {
 	gas: Long;
 	senderAddress: Address;
 	receiveAddress: Address;
-	value: BigNumber;
+	value: ?BigNumber;
 	data: Uint8Array;
 	codeAddress: Address;
 }

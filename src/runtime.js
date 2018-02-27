@@ -7,7 +7,7 @@ import BigNumber from 'bn.js';
 import Externalities from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
-import type { CALL_TYPES } from "./types";
+import { CALL_TYPE } from "./types";
 
 export async function exec(ext: Externalities, module: ArrayBuffer, context: RuntimeContext, args: ?Uint8Array): Promise<Uint8Array> {
     const imports = readImports(module);
@@ -68,6 +68,8 @@ class Runtime {
             timestamp_u64: this.timestamp_u64.bind(this),
             blocknumber_u64: this.blocknumber_u64.bind(this),
             call_u64: this.call_u64.bind(this),
+            dcall_u64: this.dcall_u64.bind(this),
+            scall_u64: this.scall_u64.bind(this),
         }});
 
         this.i64setHi = proxyInstance.exports.i64setHi;
@@ -76,6 +78,8 @@ class Runtime {
         imports.timestamp = proxyInstance.exports.timestamp;
         imports.blocknumber = proxyInstance.exports.blocknumber;
         imports.ccall = proxyInstance.exports.ccall;
+        imports.dcall = proxyInstance.exports.dcall;
+        imports.scall = proxyInstance.exports.scall;
 
         imports.storage_read = this.storage_read.bind(this);
         imports.storage_write = this.storage_write.bind(this);
@@ -85,8 +89,6 @@ class Runtime {
         imports.fetch_input = this.fetch_input.bind(this);
         imports.panic = this.panic.bind(this);
         imports.debug = this.debug.bind(this);
-        imports.dcall = this.dcall.bind(this);
-        imports.scall = this.scall.bind(this);
         imports.address = this.address.bind(this);
         imports.sender = this.sender.bind(this);
         imports.origin = this.origin.bind(this);
@@ -183,30 +185,71 @@ class Runtime {
     /**
      * Message call
      */
-    call_u64(u64GasHi: number, u64GasLo: number, addrPtr: number, valuePtr: number, inputPtr: number, inputLen: number, outputPtr: number, outputLen: number) {
-        this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
+    call_u64(u64GasHi: number, u64GasLo: number,
+            addrPtr: number,
+            valuePtr: number,
+            inputPtr: number,
+            inputLen: number,
+            resultPtr: number,
+            resultLen: number): number {
+        const resultRefArray = this.viewAt(resultPtr, resultLen);
+        const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
             this.context.address,
             this.copyAddressAt(addrPtr),
             this.copyU256At(valuePtr),
             this.copyAt(inputPtr, inputLen),
             this.copyAddressAt(addrPtr),
-            new Uint8Array([]),
-            1
+            resultRefArray,
+            CALL_TYPE.Call
         );
+        // TODO: process callResult
+        return 1;
     }
 
     /**
      * Delegate call
      */
-    dcall() {
-
+    dcall_u64(u64GasHi: number, u64GasLo: number,
+        addrPtr: number,
+        inputPtr: number,
+        inputLen: number,
+        resultPtr: number,
+        resultLen: number): number {
+        const resultRefArray = this.viewAt(resultPtr, resultLen);
+        const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
+            this.context.address,
+            this.copyAddressAt(addrPtr),
+            null,
+            this.copyAt(inputPtr, inputLen),
+            this.copyAddressAt(addrPtr),
+            resultRefArray,
+            CALL_TYPE.DelegateCall
+        );
+        // TODO: process callResult
+        return 1;
     }
 
     /**
      * Static call
      */
-    scall() {
-
+    scall_u64(u64GasHi: number, u64GasLo: number,
+        addrPtr: number,
+        inputPtr: number,
+        inputLen: number,
+        resultPtr: number,
+        resultLen: number): number {
+        const resultRefArray = this.viewAt(resultPtr, resultLen);
+        const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
+            this.context.address,
+            this.copyAddressAt(addrPtr),
+            null,
+            this.copyAt(inputPtr, inputLen),
+            this.copyAddressAt(addrPtr),
+            resultRefArray,
+            CALL_TYPE.StaticCall
+        );
+        // TODO: process callResult
+        return 1;
     }
 
     /**

@@ -2,7 +2,13 @@
 import BigNumber from "bn.js";
 import Long from "long";
 
-export const CALL_TYPES = {
+export const CALL_RESULT = {
+    Success: (0:0),
+    Reverted: (1:1),
+    Failed: (2:2),
+}
+
+export const CALL_TYPE = {
     None: (0:0),
     Call: (1:1),
     CallCode: (2:2),
@@ -15,7 +21,7 @@ export const PARAMS_TYPES = {
     Separate: (1:1),
 };
 
-export type CallType = $Values<typeof CALL_TYPES>;
+export type CallType = $Values<typeof CALL_TYPE>;
 type ParamsType = $Values<typeof PARAMS_TYPES>;
 
 export class ActionParams {
