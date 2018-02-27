@@ -8,10 +8,15 @@ import { Externalities, CALL_TYPE } from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
 
-export async function exec(ext: Externalities, module: ArrayBuffer, context: RuntimeContext, args: ?Uint8Array): Promise<Uint8Array> {
+export async function exec(
+        ext: Externalities,
+        module: ArrayBuffer,
+        context: RuntimeContext,
+        args: Uint8Array = new Uint8Array([])): Promise<Uint8Array> {
+
     const imports = readImports(module);
     const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
-    const runtime = new Runtime(memory, ext, context, args || Uint8Array.from([]));
+    const runtime = new Runtime(memory, ext, context, args);
     const instance = await runtime.instantiate(module);
     // Call export
     instance.exports.call();
@@ -21,9 +26,9 @@ export async function exec(ext: Externalities, module: ArrayBuffer, context: Run
 
 export class RuntimeContext {
     address: Address;
-	sender: Address;
-	origin: Address;
-	code_address: Address;
+    sender: Address;
+    origin: Address;
+    code_address: Address;
     value: BigNumber;
 
     constructor(address: Address, sender: Address, origin: Address, code_address: Address, value: BigNumber) {
