@@ -110,22 +110,22 @@ class Runtime {
         return instance;
     }
 
-    viewAt(ptr: ?number, len: ?number): Uint8Array {
-        return new Uint8Array(this.memory.buffer, ptr || undefined, len || undefined);
+    viewAt(ptr: number = 0, len?: number): Uint8Array {
+        return new Uint8Array(this.memory.buffer, ptr, len);
     }
 
-    copyAt(ptr: ?number, len: ?number): Uint8Array {
+    copyAt(ptr: number = 0, len?: number): Uint8Array {
         const newArray = new Uint8Array(len || 0);
-        newArray.set(new Uint8Array(this.memory.buffer, ptr || undefined, len || 0));
+        newArray.set(new Uint8Array(this.memory.buffer, ptr, len));
         return newArray;
-    }
-
-    copyAddressAt(ptr: number): Address {
-        return Address.copy(this.memory.buffer, ptr);
     }
 
     viewAddressAt(ptr: number): Address {
         return Address.view(this.memory.buffer, ptr);
+    }
+
+    copyAddressAt(ptr: number): Address {
+        return Address.copy(this.memory.buffer, ptr);
     }
 
     viewH256At(ptr: number): H256 {
@@ -147,10 +147,6 @@ class Runtime {
 
     copyU256At(ptr: number): BigNumber {
         return new BigNumber(this.copyAt(ptr, 32), 10, 'be');
-    }
-
-    writeAddressInto(ptr: number, value: H256) {
-        value.write(this.memory.buffer, ptr);
     }
 
     /**
