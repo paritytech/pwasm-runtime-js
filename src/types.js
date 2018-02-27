@@ -2,6 +2,12 @@
 import BigNumber from "bn.js";
 import Long from "long";
 
+export const CONTRACT_CREATE_RESULT = {
+    Created: (0:0),
+    Reverted: (1:1),
+    Failed: (2:2),
+}
+
 export const CALL_RESULT = {
     Success: (0:0),
     Reverted: (1:1),

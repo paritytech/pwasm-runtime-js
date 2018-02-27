@@ -182,6 +182,19 @@ class Runtime {
         this.ext.setStorage(this.viewH256At(keyPtr), this.viewH256At(valPtr));
     }
 
+     /**
+     * Creates a new contract
+
+	 #Arguments:
+     * valuePtr - how much value (in Wei) transfer to the newly created contract
+	 * codePtr - pointer to the code data
+	 * codeLen - length of the code data
+	 * resultAddrPtr - pointer to write an address of the newly created contract
+     */
+    create(valuePtr: number, codePtr: number, codeLen: number, resultAddrPtr: number) {
+        const createResult = this.ext.create(new Long(), this.copyU256At(valuePtr), this.copyAt(codePtr, codeLen)) // TODO: gaslimit
+    }
+
     /**
      * Message call
      */
@@ -277,19 +290,6 @@ class Runtime {
      */
     value(dest) {
         this.writeU256Into(dest, this.context.value);
-    }
-
-    /**
-     * Creates a new contract
-
-	 #Arguments:
-     * endowment - how much value (in Wei) transfer to the newly created contract
-	 * code_ptr - pointer to the code data
-	 * code_len - length of the code data
-	 * result_ptr - pointer to write an address of the newly created contract
-     */
-    create() {
-
     }
 
     /**

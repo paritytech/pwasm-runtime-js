@@ -9,7 +9,6 @@ type FakeCreate = {
 	gas: Long;
 	value: BigNumber;
 	code: Uint8Array;
-	address: Address;
 }
 
 type FakeCall = {
@@ -62,8 +61,8 @@ export default class Externalities {
     blockhash(number) {
         throw "not impl";
     }
-    create(gas: Long, value: BigNumber, code: Uint8Array, address: Address) {
-        this.creates.push({gas, value, code, address});
+    create(gas: Long, value: BigNumber, code: Uint8Array) {
+        this.creates.push({gas, value, code});
     }
     call(gas: Long, senderAddress: Address, receiveAddress: Address, value: BigNumber,
             data: Uint8Array, codeAddress: Address, output: Uint8Array, callType: CallType) {
