@@ -4,10 +4,9 @@ import fs from 'fs';
 import Long from 'long';
 import BigNumber from 'bn.js';
 
-import Externalities from "./externalities";
+import { Externalities, CALL_TYPE } from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
 import { readImports } from "./utils";
-import { CALL_TYPE } from "./types";
 
 export async function exec(ext: Externalities, module: ArrayBuffer, context: RuntimeContext, args: ?Uint8Array): Promise<Uint8Array> {
     const imports = readImports(module);
@@ -37,6 +36,7 @@ export class RuntimeContext {
 
     static default() {
         return new RuntimeContext(new Address(new Uint8Array([])),
+            new Address(new Uint8Array([])),
             new Address(new Uint8Array([])),
             new Address(new Uint8Array([])),
             new BigNumber(0))
@@ -81,6 +81,7 @@ class Runtime {
         imports.dcall = proxyInstance.exports.dcall;
         imports.scall = proxyInstance.exports.scall;
 
+        imports.create = this.create.bind(this);
         imports.storage_read = this.storage_read.bind(this);
         imports.storage_write = this.storage_write.bind(this);
         imports.ret = this.ret.bind(this);

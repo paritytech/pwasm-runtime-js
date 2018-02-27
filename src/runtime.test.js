@@ -2,8 +2,40 @@ import fs from 'fs';
 import Long from 'long';
 
 import { exec, RuntimeContext } from './runtime';
-import Externalities from './externalities';
+import { Externalities, CALL_TYPE } from "./externalities";
 import { H256 } from './types';
+
+test('create', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/creator.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.creates.length).toBe(1);
+});
+
+test('dcall', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/call_code.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.calls.length).toBe(1);
+});
+
+test('dcall', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/call_code.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.calls.length).toBe(1);
+});
+
+test('scall', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/call_static.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.calls.length).toBe(1);
+});
 
 test('ccall', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/call.wasm');
