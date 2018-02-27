@@ -5,6 +5,14 @@ import { exec, RuntimeContext } from './runtime';
 import { Externalities, CALL_TYPE } from "./externalities";
 import { H256 } from './types';
 
+test('elog', async () => {
+    let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/events.wasm');
+    let ext = new Externalities();
+    let result = await exec(ext, wasm, RuntimeContext.default());
+
+    expect(ext.logs.length).toBe(1);
+});
+
 test('create', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/creator.wasm');
     let ext = new Externalities();

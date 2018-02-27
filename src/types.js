@@ -1,7 +1,7 @@
 // @flow
 import BigNumber from "bn.js";
 import Long from "long";
-
+import type { CallType } from "./externalities";
 
 
 export const PARAMS_TYPES = {

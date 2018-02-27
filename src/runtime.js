@@ -115,16 +115,20 @@ class Runtime {
         return newArray;
     }
 
-    copyAddressAt (ptr: number): Address {
+    copyAddressAt(ptr: number): Address {
         return Address.copy(this.memory.buffer, ptr);
     }
 
-    viewAddressAt (ptr: number): Address {
+    viewAddressAt(ptr: number): Address {
         return Address.view(this.memory.buffer, ptr);
     }
 
-    viewH256At (ptr: number): H256 {
+    viewH256At(ptr: number): H256 {
         return H256.view(this.memory.buffer, ptr);
+    }
+
+    copyH256At(ptr: number): H256 {
+        return H256.copy(this.memory.buffer, ptr);
     }
 
     writeInto(ptr: number, value: FixedArray) {
@@ -267,6 +271,17 @@ class Runtime {
     }
 
     /**
+     * Signature: `fn elog(topic_ptr: *const u8, topic_count: u32, data_ptr: *const u8, data_len: u32)`
+     */
+    elog(topicPtr: number, topicCount: number, dataPtr: number, dataLen: number) {
+        const topics = [];
+        for (let i = 0; i < topicCount; i++) {
+            topics.push(this.copyH256At(topicPtr + 32 * i));
+        }
+        this.ext.log(topics, this.copyAt(dataPtr, dataLen));
+    }
+
+    /**
      * Report gas cost with the params passed in wasm stack
      */
     gas() {
@@ -300,13 +315,6 @@ class Runtime {
         this.ext.suicide(this.viewAddressAt(addrPtr));
     }
 
-    /**
-     * Signature: `fn blockhash(number: i64, dest: *mut u8)`
-     */
-
-    blockhash() {
-
-    }
 
     /**
      * Signature: `fn coinbase(dest: *mut u8)`
@@ -327,6 +335,14 @@ class Runtime {
      */
     gaslimit(dest) {
         this.writeU256Into(dest, this.ext.getEnvInfo().gasLimit);
+    }
+
+    /**
+     * Signature: `fn blockhash(number: i64, dest: *mut u8)`
+     */
+
+    blockhash() {
+
     }
 
     /**
@@ -366,12 +382,5 @@ class Runtime {
      */
     origin(dest) {
         this.writeInto(dest, this.context.origin);
-    }
-
-    /**
-     * Signature: `fn elog(topic_ptr: *const u8, topic_count: u32, data_ptr: *const u8, data_len: u32)`
-     */
-    elog() {
-
     }
 }

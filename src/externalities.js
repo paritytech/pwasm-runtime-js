@@ -24,10 +24,14 @@ export const CALL_TYPE = {
     StaticCall: (4:4),
 };
 
-
 export type ContractCreateResult = $Values<typeof CONTRACT_CREATE_RESULT>;
 export type CallType = $Values<typeof CALL_TYPE>;
 export type CallResult = $Values<typeof CALL_RESULT>;
+
+type FakeLogEntry = {
+	topics: Array<H256>,
+	data: Uint8Array;
+}
 
 type FakeCreate = {
 	gas: Long;
@@ -52,12 +56,14 @@ export class Externalities {
     blockhashes: Map<number, H256>;
     calls: Array<FakeCall>;
     creates: Array<FakeCreate>;
+    logs: Array<FakeLogEntry>;
 
     constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
         this.storage = new Map();
         this.envInfo = params.envInfo;
         this.calls = [];
         this.creates = [];
+        this.logs = [];
     }
 
     getEnvInfo(): EnvInfo {
@@ -82,6 +88,10 @@ export class Externalities {
         return CALL_RESULT.Failed;
     }
 
+    log(topics: Array<H256>, data: Uint8Array) {
+        this.logs.push({topics, data});
+    }
+
     exists() {
         throw "not impl";
     }
@@ -100,9 +110,6 @@ export class Externalities {
         throw "not impl";
     }
     extcode(address) {
-        throw "not impl";
-    }
-    log(topics, data) {
         throw "not impl";
     }
 
