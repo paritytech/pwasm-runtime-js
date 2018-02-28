@@ -8,13 +8,13 @@ export const CONTRACT_CREATE_RESULT = {
     Created: (0:0),
     Reverted: (1:1),
     Failed: (2:2),
-}
+};
 
 export const CALL_RESULT = {
     Success: (0:0),
     Reverted: (1:1),
     Failed: (2:2),
-}
+};
 
 export const CALL_TYPE = {
     None: (0:0),
@@ -25,28 +25,28 @@ export const CALL_TYPE = {
 };
 
 export type ContractCreateResult = $Values<typeof CONTRACT_CREATE_RESULT>;
-export type CallType = $Values<typeof CALL_TYPE>;
 export type CallResult = $Values<typeof CALL_RESULT>;
+export type CallType = $Values<typeof CALL_TYPE>;
 
 type FakeLogEntry = {
-	topics: Array<H256>,
-	data: Uint8Array;
+    topics: Array<H256>,
+    data: Uint8Array;
 }
 
 type FakeCreate = {
-	gas: Long;
-	value: BigNumber;
-	code: Uint8Array;
+    gas: Long;
+    value: BigNumber;
+    code: Uint8Array;
 }
 
 type FakeCall = {
     callType: CallType;
-	gas: Long;
-	senderAddress: Address;
-	receiveAddress: Address;
-	value: ?BigNumber;
-	data: Uint8Array;
-	codeAddress: Address;
+    gas: Long;
+    senderAddress: Address;
+    receiveAddress: Address;
+    value: ?BigNumber;
+    data: Uint8Array;
+    codeAddress: Address;
 }
 
 export class Externalities {

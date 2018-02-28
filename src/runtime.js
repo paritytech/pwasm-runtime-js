@@ -191,11 +191,11 @@ class Runtime {
      /**
      * Creates a new contract
 
-	 #Arguments:
+     #Arguments:
      * valuePtr - how much value (in Wei) transfer to the newly created contract
-	 * codePtr - pointer to the code data
-	 * codeLen - length of the code data
-	 * resultAddrPtr - pointer to write an address of the newly created contract
+     * codePtr - pointer to the code data
+     * codeLen - length of the code data
+     * resultAddrPtr - pointer to write an address of the newly created contract
      */
     create(valuePtr: number, codePtr: number, codeLen: number, resultAddrPtr: number) {
         const createResult = this.ext.create(new Long(), this.copyU256At(valuePtr), this.copyAt(codePtr, codeLen)) // TODO: gaslimit
@@ -295,10 +295,10 @@ class Runtime {
      * Contract can invoke this when he encounters unrecoverable error.
      */
     panic() {
-
+        throw("Panic in contract");
     }
 
-    debug() {
+    debug(ptr) {
 
     }
 
