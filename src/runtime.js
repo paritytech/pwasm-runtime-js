@@ -23,7 +23,32 @@ export class RuntimeContext {
         this.value = value;
     }
 
-    static default() {
+    withAddress(address: Address): RuntimeContext {
+        this.address = address;
+        return this;
+    }
+
+    withSender(sender: Address): RuntimeContext {
+        this.sender = sender;
+        return this;
+    }
+
+    withOrigin(origin: Address): RuntimeContext {
+        this.origin = origin;
+        return this;
+    }
+
+    withCodeAddress(codeAddress: Address): RuntimeContext {
+        this.code_address = codeAddress;
+        return this;
+    }
+
+    withValue(value: BigNumber): RuntimeContext {
+        this.value = value;
+        return this;
+    }
+
+    static default(): RuntimeContext {
         return new RuntimeContext(new Address(new Uint8Array([])),
             new Address(new Uint8Array([])),
             new Address(new Uint8Array([])),
