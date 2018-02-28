@@ -3,26 +3,10 @@
 import fs from 'fs';
 import Long from 'long';
 import BigNumber from 'bn.js';
+import path from 'path';
 
 import { Externalities, CALL_TYPE } from "./externalities";
 import { FixedArray, Address, H256 } from "./types";
-import { readImports } from "./utils";
-
-export async function exec(
-        ext: Externalities,
-        module: ArrayBuffer,
-        context: RuntimeContext,
-        args: Uint8Array = new Uint8Array([])): Promise<Uint8Array> {
-
-    const imports = readImports(module);
-    const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
-    const runtime = new Runtime(memory, ext, context, args);
-    const instance = await runtime.instantiate(module);
-    // Call export
-    instance.exports.call();
-    // Return result from runtime
-    return runtime.result;
-}
 
 export class RuntimeContext {
     address: Address;
@@ -48,7 +32,7 @@ export class RuntimeContext {
     }
 }
 
-class Runtime {
+export class Runtime {
     memory: Object;
     ext: Externalities;
     args: Uint8Array;
@@ -68,7 +52,7 @@ class Runtime {
         const imports = {};
 
         imports.memory = this.memory;
-        const proxy = fs.readFileSync('/Users/fro/parity/pwasm-runtime/src/proxy.wasm');
+        const proxy = fs.readFileSync(path.resolve(__dirname, "./wasm/proxy.wasm"));
         const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env: {
             timestamp_u64: this.timestamp_u64.bind(this),
             blocknumber_u64: this.blocknumber_u64.bind(this),

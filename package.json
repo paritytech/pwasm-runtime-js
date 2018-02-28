@@ -7,6 +7,7 @@
     "pwasm-test": "babel ./main.js"
   },
   "scripts": {
+    "pwasm-test": "babel-node ./main.js",
     "test": "jest",
     "flow": "flow",
     "build": "babel src/ -d lib/",

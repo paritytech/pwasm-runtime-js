@@ -1,9 +1,7 @@
 import fs from 'fs';
 import Long from 'long';
 
-import { exec, RuntimeContext } from './runtime';
-import { Externalities, CALL_TYPE } from "./externalities";
-import { H256 } from './types';
+import { exec, Externalities, RuntimeContext, CALL_TYPE, H256 } from ".";
 
 test('elog', async () => {
     let wasm = fs.readFileSync('/Users/fro/parity/wasm-tests/compiled/events.wasm');

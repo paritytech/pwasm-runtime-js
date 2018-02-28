@@ -1,6 +1,21 @@
 import { BinaryReader, BinaryReaderState, ExternalKind } from 'wasmparser';
 
-export function readImports (module: ArrayBuffer) {
+type Imports = {
+    memory: {
+        limits: {
+            initial: number,
+            maximum?: number,
+        }
+    },
+    table: {
+        limits: {
+            initial: number,
+            maximum?: number,
+        }
+    }
+}
+
+export function readImports (module: ArrayBuffer): Imports {
     const reader = new BinaryReader();
     let result = {};
     reader.setData(module, 0, module.byteLength);

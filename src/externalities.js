@@ -1,5 +1,4 @@
 // @flow
-
 import BigNumber from "bn.js";
 import Long from "long";
 import { H256, EnvInfo, Address } from "./types";
