@@ -2,6 +2,7 @@
 import BigNumber from "bn.js";
 import Long from "long";
 import type { CallType } from "./externalities";
+import { bytesToHex, hexToBytes } from "./utils";
 
 
 export const PARAMS_TYPES = {
@@ -109,26 +110,4 @@ export class Address extends FixedArray {
         const view = new Uint8Array(buffer, offset, 20);
         return new Address(view);
     }
-}
-
-function bytesToHex(bytes: Uint8Array): string {
-    return Buffer.from(bytes).toString('hex');
-}
-
-function hexToBytes(hex: string) {
-    if (!hex) {
-      return [];
-    }
-    if (hex.startsWith("0x")) {
-        hex = hex.slice(2);
-    }
-    let len = hex.length;
-    let res = [];
-
-    for (let i = 0; i < len; i += 2) {
-      let byte = parseInt(hex.slice(i, i + 2), 16);
-
-      res.push(byte);
-    }
-    return res;
 }

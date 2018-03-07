@@ -1,4 +1,5 @@
 (module
+    (import "env" "blockhash_u64" (func $blockhash_u64 (param i32) (param i32) (param i32)))
     (import "env" "timestamp_u64" (func $timestamp_u64 (result i32)))
     (import "env" "blocknumber_u64" (func $blocknumber_u64 (result i32)))
     (import "env" "call_u64" (func $call_u64
@@ -32,6 +33,14 @@
                 )
                 (i64.const 32)
             )
+        )
+    )
+
+    (func (export "blockhash") (param $blocknumber i64) (param $dest i32)
+        (call $blockhash_u64
+            (i32.wrap/i64 (i64.shr_u (get_local $blocknumber) (i64.const 32)))
+            (i32.wrap/i64 (get_local $blocknumber))
+            (get_local $dest)
         )
     )
 

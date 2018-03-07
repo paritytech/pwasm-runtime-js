@@ -105,8 +105,8 @@ export class Externalities {
     balance(address) {
         throw "not impl";
     }
-    blockhash(number) {
-        throw "not impl";
+    blockhash(number: Long) {
+        return new Uint8Array([]);
     }
     extcode(address) {
         throw "not impl";

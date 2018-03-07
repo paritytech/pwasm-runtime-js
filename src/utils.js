@@ -34,3 +34,25 @@ export function readImports (module: ArrayBuffer): Imports {
     }
     return result;
 }
+
+export function bytesToHex(bytes: Uint8Array): string {
+    return Buffer.from(bytes).toString('hex');
+}
+
+export function hexToBytes(hex: string) {
+    if (!hex) {
+      return [];
+    }
+    if (hex.startsWith("0x")) {
+        hex = hex.slice(2);
+    }
+    let len = hex.length;
+    let res = [];
+
+    for (let i = 0; i < len; i += 2) {
+      let byte = parseInt(hex.slice(i, i + 2), 16);
+
+      res.push(byte);
+    }
+    return res;
+}

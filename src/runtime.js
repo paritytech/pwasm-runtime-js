@@ -79,6 +79,7 @@ export class Runtime {
         imports.memory = this.memory;
         const proxy = fs.readFileSync(path.resolve(__dirname, "./wasm/proxy.wasm"));
         const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env: {
+            blockhash_u64: this.blockhash_u64.bind(this),
             timestamp_u64: this.timestamp_u64.bind(this),
             blocknumber_u64: this.blocknumber_u64.bind(this),
             call_u64: this.call_u64.bind(this),
@@ -89,6 +90,7 @@ export class Runtime {
         this.i64setHi = proxyInstance.exports.i64setHi;
         this.i64getHi = proxyInstance.exports.i64getHi;
 
+        imports.blockhash = proxyInstance.exports.blockhash;
         imports.timestamp = proxyInstance.exports.timestamp;
         imports.blocknumber = proxyInstance.exports.blocknumber;
         imports.ccall = proxyInstance.exports.ccall;
@@ -109,7 +111,6 @@ export class Runtime {
         imports.origin = this.origin.bind(this);
         imports.value = this.value.bind(this);
         imports.suicide = this.suicide.bind(this);
-        imports.blockhash = this.blockhash.bind(this);
         imports.coinbase = this.coinbase.bind(this);
         imports.difficulty = this.difficulty.bind(this);
         imports.gaslimit = this.gaslimit.bind(this);
@@ -351,8 +352,7 @@ export class Runtime {
      * Signature: `fn blockhash(number: i64, dest: *mut u8)`
      */
 
-    blockhash() {
-
+    blockhash_u64(numberHI: number, numberLO: number, destPtr: number) {
     }
 
     /**

@@ -1,0 +1,3 @@
+[submodule "wasm-tests"]
+	path = wasm-tests
+	url = git@github.com:paritytech/wasm-tests.git

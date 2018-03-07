@@ -2,6 +2,7 @@ import minimist from "minimist";
 import fs from "fs";
 import path from "path";
 import { exec, Externalities, RuntimeContext } from "."
+import { bytesToHex } from "./src/utils";
 
 try {
     (async function() {
@@ -12,7 +13,9 @@ try {
             const tests = JSON.parse(file);
 
             for (let test of tests) {
+                process.stdout.write(test.caption + ".. ");
                 await runTest(test);
+                process.stdout.write("OK");
             }
         } else {
             console.log("Usage: pwasm-test <file>");
@@ -29,5 +32,7 @@ async function runTest(test) {
     const ext = new Externalities();
     const context = RuntimeContext.default();
     context.withSender(test.sender);
-    await exec(ext, module, context);
+    const result = await exec(ext, module, context);
+    console.log(bytesToHex(result));
+    return bytesToHex(result) === test.asserts.Return;
 }
