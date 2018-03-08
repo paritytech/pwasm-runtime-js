@@ -1,7 +1,7 @@
 [
     {
         "caption": "dispersion 1",
-        "source": "./compiled/dispersion.wasm",
+        "source": "./wasm-tests/compiled/dispersion.wasm",
         "payload": "0x736f6d657468696e67",
         "gasLimit": 100000,
         "asserts": [
@@ -10,7 +10,7 @@
     },
     {
         "caption": "dispersion 2",
-        "source": "./compiled/dispersion.wasm",
+        "source": "./wasm-tests/compiled/dispersion.wasm",
         "payload": "0x3e2e3160f6496cfca14877d68a8473f421e292bb81c7b6b7f4e29f647327cfeb",
         "gasLimit": 100000,
         "asserts": [

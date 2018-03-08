@@ -1,7 +1,7 @@
 [
     {
         "caption": "addition 1",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x0000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002",
         "gasLimit": 100000,
         "asserts": [
@@ -10,7 +10,7 @@
     },
     {
         "caption": "addition 2",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x0001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000",
         "gasLimit": 100000,
         "asserts": [
@@ -19,7 +19,7 @@
     },
     {
         "caption": "multiplication 1",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x01000000000000000000000000000000000000000000904D0EADA00E6305DF37CB00000000000000000000000000000000000000000000021E19E0C9BAB23FFFFE",
         "gasLimit": 100000,
         "asserts": [
@@ -28,7 +28,7 @@
     },
     {
         "caption": "multiplication 2",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x01000000000000000000000000000000000000000000904D0EADA00E6305DF37CB00000000000000000000000000000000000000000000021E19E0C9BAB23FFFFE",
         "gasLimit": 100000,
         "asserts": [
@@ -37,7 +37,7 @@
     },
     {
         "caption": "subtraction 1",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x02000000000000000000000000000000000000000000904D0EADA00E6305DF37CB00000000000000000000000000000000000000000000021E19E0C9BAB23FFFFE",
         "gasLimit": 100000,
         "asserts": [
@@ -46,7 +46,7 @@
     },
     {
         "caption": "division 1",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x04000000000000000000000000000000000000000000904D0EADA00E6305DF37CB000000000000000000000000000000000000000000904D0EADA00E6305DF37CB",
         "gasLimit": 100000,
         "asserts": [
@@ -55,7 +55,7 @@
     },
     {
         "caption": "division 2",
-        "source": "./compiled/math.wasm",
+        "source": "./wasm-tests/compiled/math.wasm",
         "payload": "0x04000000000000000000000000000000000000009873904D0EADA00E6305DF37CB000000000000000000000000000000000000000000904D0EADA00E6305DF37CB",
         "gasLimit": 100000,
         "asserts": [

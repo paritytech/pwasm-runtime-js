@@ -39,9 +39,9 @@ export function bytesToHex(bytes: Uint8Array): string {
     return Buffer.from(bytes).toString('hex');
 }
 
-export function hexToBytes(hex: string) {
+export function hexToBytes(hex: string): Uint8Array {
     if (!hex) {
-      return [];
+      return new Uint8Array([]);
     }
     if (hex.startsWith("0x")) {
         hex = hex.slice(2);
@@ -54,5 +54,23 @@ export function hexToBytes(hex: string) {
 
       res.push(byte);
     }
-    return res;
+    return new Uint8Array(res);
+}
+
+export function toArrayBuffer(buf: Buffer) {
+    var ab = new ArrayBuffer(buf.length);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        view[i] = buf[i];
+    }
+    return ab;
+}
+
+export function toBuffer(ab: ArrayBuffer) {
+    var buf = new Buffer(ab.byteLength);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        buf[i] = view[i];
+    }
+    return buf;
 }

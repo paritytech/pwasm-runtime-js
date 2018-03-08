@@ -1,7 +1,7 @@
 // @flow
 
 import type { ActionParams } from './src/types';
-import { H256 } from './src/types';
+import { H256, Address } from './src/types';
 import { Externalities, CALL_TYPE } from './src/externalities';
 import { readImports } from "./src/utils";
 import { Runtime, RuntimeContext } from "./src/runtime";
@@ -22,5 +22,5 @@ export async function exec(
     return runtime.result;
 }
 
-export { Runtime, RuntimeContext, Externalities, CALL_TYPE, H256 };
+export { Runtime, RuntimeContext, Externalities, CALL_TYPE, H256, Address };
 export type { ActionParams };

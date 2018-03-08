@@ -1,7 +1,7 @@
 [
     {
         "caption": "Call code",
-        "source": "./compiled/call_code.wasm",
+        "source": "./wasm-tests/compiled/call_code.wasm",
         "payload": "0x736f6d657468696e67",
         "sender": "0x01030507090b0d0f11131517191b1d1f21232527",
         "gasLimit": 100000,
@@ -15,7 +15,7 @@
     },
     {
         "caption": "Call static",
-        "source": "./compiled/call_static.wasm",
+        "source": "./wasm-tests/compiled/call_static.wasm",
         "payload": "0x736f6d657468696e67",
         "sender": "0x01030507090b0d0f11131517191b1d1f21232527",
         "gasLimit": 100000,

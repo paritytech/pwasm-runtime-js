@@ -1,7 +1,7 @@
 [
     {
         "caption": "keccak of \"something\"",
-        "source": "./compiled/keccak.wasm",
+        "source": "./wasm-tests/compiled/keccak.wasm",
         "payload": "0x736f6d657468696e67",
         "gasLimit": 100000,
         "asserts": [
@@ -10,7 +10,7 @@
     },
     {
         "caption": "keccak  of \"this tests were started at Dec, 1, 2017\"",
-        "source": "./compiled/keccak.wasm",
+        "source": "./wasm-tests/compiled/keccak.wasm",
         "payload": "7468697320746573747320776572652073746172746564206174204465632c20312c2032303137",
         "gasLimit": 100000,
         "asserts": [
@@ -19,7 +19,7 @@
     },
     {
         "caption": "keccak of space symbol",
-        "source": "./compiled/keccak.wasm",
+        "source": "./wasm-tests/compiled/keccak.wasm",
         "payload": "0x20",
         "gasLimit": 100000,
         "asserts": [
