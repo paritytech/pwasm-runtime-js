@@ -52,14 +52,20 @@ export class Externalities {
 
     storage: Map<string, H256>;
     envInfo: EnvInfo;
-    blockhashes: Map<number, H256>;
+    blockhashes: Map<string, H256>;
     calls: Array<FakeCall>;
     creates: Array<FakeCreate>;
     logs: Array<FakeLogEntry>;
 
-    constructor(params : { envInfo: EnvInfo } = { envInfo: EnvInfo.default()}) {
+    constructor({
+            envInfo = EnvInfo.default(),
+            blockhashes = new Map()
+        } : { envInfo: EnvInfo, blockhashes: Map<string, H256> } = {
+            envInfo: EnvInfo.default(),
+            blockhashes: new Map()}) {
         this.storage = new Map();
-        this.envInfo = params.envInfo;
+        this.envInfo = envInfo;
+        this.blockhashes = blockhashes;
         this.calls = [];
         this.creates = [];
         this.logs = [];
@@ -105,8 +111,8 @@ export class Externalities {
     balance(address) {
         throw "not impl";
     }
-    blockhash(number: Long) {
-        return new Uint8Array([]);
+    blockhash(number: Long): H256 {
+        return this.blockhashes.get(number.toString()) || new H256(new Uint8Array([]));
     }
     extcode(address) {
         throw "not impl";

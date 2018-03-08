@@ -353,6 +353,8 @@ export class Runtime {
      */
 
     blockhash_u64(numberHI: number, numberLO: number, destPtr: number) {
+        this.writeInto(destPtr,
+            this.ext.blockhash(Long.fromBits(numberLO, numberHI)));
     }
 
     /**
