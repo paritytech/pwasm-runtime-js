@@ -5,6 +5,7 @@ import { H256, Address } from './src/types';
 import { Externalities, CALL_TYPE } from './src/externalities';
 import { readImports } from "./src/utils";
 import { Runtime, RuntimeContext } from "./src/runtime";
+import { inject_gas_counter } from "./src/injector";
 
 export async function exec(
     ext: Externalities,
@@ -22,5 +23,9 @@ export async function exec(
     return runtime.result;
 }
 
-export { Runtime, RuntimeContext, Externalities, CALL_TYPE, H256, Address };
+export async function inject_gas(module: ArrayBuffer): Promise<ArrayBuffer> {
+    return inject_gas_counter(module);
+}
+
+export { Runtime, RuntimeContext, Externalities, CALL_TYPE, H256, Address, inject_gas_counter };
 export type { ActionParams };

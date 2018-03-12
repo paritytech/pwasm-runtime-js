@@ -1,0 +1,16 @@
+[package]
+name = "gas-injector"
+version = "0.1.0"
+authors = ["fro <frol.rage@gmail.com>"]
+
+[profile.release]
+panic = "abort"
+lto = true
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+parity-wasm = "0.27"
+wasm-utils = { git = "https://github.com/paritytech/wasm-utils" }
