@@ -52,9 +52,9 @@ mod internal {
         opcodes_div: u32,
     }
 
-    pub fn inject_gas(input: &[u8], schedule_json_bytes: &[u8]) -> Vec<u8> {
+    pub fn inject_gas(input: &[u8], schedule_json: &[u8]) -> Vec<u8> {
         let module = parity_wasm::deserialize_buffer(input).expect("Error deserialize_buffer");
-        let schedule: WasmSchedule = serde_json::from_slice(schedule_json_bytes).expect("Error while WasmSchedule deserializing");
+        let schedule: WasmSchedule = serde_json::from_slice(schedule_json).expect("Error while WasmSchedule deserializing");
         // TODO: use custom Ruleset
         let module_counted = inject_gas_counter(module, &gas_rules(schedule)).expect("Error inject_gas_counter");
         parity_wasm::serialize(module_counted).expect("Error serialize")

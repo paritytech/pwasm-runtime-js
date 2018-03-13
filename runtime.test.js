@@ -74,7 +74,6 @@ test('keccak', async () => {
     let ext = new Externalities();
     let bytes = Uint8Array.from("something".split("").map((c) => c.charCodeAt()));
     let { data: result, gasLeft } = await exec(ext, wasm, RuntimeContext.default(), new Long(100000), bytes);
-    console.log(gasLeft.toString());
     expect(new H256(result))
         .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
 });
