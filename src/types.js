@@ -4,6 +4,24 @@ import Long from "long";
 import type { CallType } from "./externalities";
 import { bytesToHex, hexToBytes } from "./utils";
 
+export type Result = {
+    gasLeft: Long;
+    data: Uint8Array;
+}
+
+export type WasmSchedule = {
+    regular: number,
+    div: number,
+    mul: number,
+    mem: number,
+    static_u256: number,
+    static_address: number,
+    initial_mem: number,
+    grow_mem: number,
+    max_stack_height: number,
+    opcodes_mul: number,
+    opcodes_div: number,
+}
 
 export const PARAMS_TYPES = {
     Embedded: (0:0),

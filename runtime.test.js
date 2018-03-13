@@ -9,7 +9,7 @@ import { Address } from './src/types';
 test('elog', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/events.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.logs.length).toBe(1);
 });
@@ -17,7 +17,7 @@ test('elog', async () => {
 test('create', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/creator.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.creates.length).toBe(1);
 });
@@ -25,7 +25,7 @@ test('create', async () => {
 test('dcall', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/call_code.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.calls.length).toBe(1);
 });
@@ -33,7 +33,7 @@ test('dcall', async () => {
 test('dcall', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/call_code.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.calls.length).toBe(1);
 });
@@ -41,7 +41,7 @@ test('dcall', async () => {
 test('scall', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/call_static.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.calls.length).toBe(1);
 });
@@ -49,7 +49,7 @@ test('scall', async () => {
 test('ccall', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/call.wasm'));
     let ext = new Externalities();
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let result = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
 
     expect(ext.calls.length).toBe(1);
     let call = ext.calls[0];
@@ -64,7 +64,7 @@ test('storage_read', async () => {
         H256.fromString("0x0100000000000000000000000000000000000000000000000000000000000000"),
         H256.fromString("0xaf0fa234a6af46afa23faf23bcbc1c1cb4bcb7bcbe7e7e7ee3ee2edddddddddd"));
 
-    let result = await exec(ext, wasm, RuntimeContext.default());
+    let { data: result } = await exec(ext, wasm, RuntimeContext.default(), new Long(100000));
     expect(new H256(result))
         .toEqual(H256.fromString("0xaf0fa234a6af46afa23faf23bcbc1c1cb4bcb7bcbe7e7e7ee3ee2edddddddddd"));
 });
@@ -73,7 +73,8 @@ test('keccak', async () => {
     let wasm = fs.readFileSync(resolve('./wasm-tests/compiled/keccak.wasm'));
     let ext = new Externalities();
     let bytes = Uint8Array.from("something".split("").map((c) => c.charCodeAt()));
-    let result = await exec(ext, wasm, RuntimeContext.default(), bytes);
+    let { data: result, gasLeft } = await exec(ext, wasm, RuntimeContext.default(), new Long(100000), bytes);
+    console.log(gasLeft.toString());
     expect(new H256(result))
         .toEqual(H256.fromString("0x68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87"));
 });
@@ -96,7 +97,7 @@ test('externs', async () => {
         ])
     });
 
-    let result = await exec(ext, wasm, RuntimeContext.default().address);
+    let { data: result } = await exec(ext, wasm, RuntimeContext.default().address, new Long(100000));
     expect(new H256(result.slice(0, 32))).toEqual(H256.fromString("0x9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d9d"));
     expect(new H256(result.slice(32, 64))).toEqual(H256.fromString("0x7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b"));
     expect(new Address(result.slice(64, 84))).toEqual(Address.fromString("0xefefefefefefefefefefefefefefefefefefefef"));

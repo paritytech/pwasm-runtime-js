@@ -1,7 +1,10 @@
 // @flow
+
+import type { WasmSchedule } from "./types";
 import BigNumber from "bn.js";
 import Long from "long";
 import { H256, EnvInfo, Address } from "./types";
+import schedule from "./schedule";
 
 export const CONTRACT_CREATE_RESULT = {
     Created: (0:0),
@@ -69,6 +72,10 @@ export class Externalities {
         this.calls = [];
         this.creates = [];
         this.logs = [];
+    }
+
+    schedule(): WasmSchedule {
+        return schedule;
     }
 
     getEnvInfo(): EnvInfo {

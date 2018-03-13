@@ -65,15 +65,30 @@ export class Runtime {
     result: Uint8Array;
     i64setHi: Function;
     i64getHi: Function;
+    gasCounter: Long;
+    gasLimit: Long;
 
-    constructor (memory: Object, ext: Externalities, context: RuntimeContext, args: Uint8Array) {
+    constructor (memory: Object, ext: Externalities, context: RuntimeContext, gasLimit: Long, args: Uint8Array) {
         this.memory = memory;
         this.ext = ext;
         this.args = args;
         this.context = context;
+        this.gasLimit = gasLimit;
+        this.gasCounter = new Long(0);
     }
 
-    async instantiate(module: ArrayBuffer): Promise<Object> {
+    gasLeft(): Long {
+        return this.gasLimit.sub(this.gasCounter);
+    }
+
+    charge(amount: Long) {
+        this.gasCounter = this.gasCounter.add(amount);
+        if (this.gasCounter.greaterThan(this.gasLimit)) {
+            throw new Error("Out of gas");
+        }
+    }
+
+    async instantiate(contract: ArrayBuffer): Promise<Object> {
         const imports = {};
 
         imports.memory = this.memory;
@@ -116,7 +131,7 @@ export class Runtime {
         imports.gaslimit = this.gaslimit.bind(this);
         imports.elog = this.elog.bind(this);
 
-        const { instance } = await global.WebAssembly.instantiate(module, {env: imports});
+        const { instance } = await global.WebAssembly.instantiate(contract, {env: imports});
         return instance;
     }
 
@@ -295,8 +310,8 @@ export class Runtime {
     /**
      * Report gas cost with the params passed in wasm stack
      */
-    gas() {
-
+    gas(amount: number) {
+        this.charge(amount);
     }
 
     /**
@@ -308,14 +323,14 @@ export class Runtime {
         throw("Panic in contract");
     }
 
-    debug(ptr) {
+    debug(ptr: number) {
 
     }
 
     /**
      * Returns value (in Wei) passed to contract
      */
-    value(dest) {
+    value(dest: number) {
         this.writeU256Into(dest, this.context.value);
     }
 
@@ -337,14 +352,14 @@ export class Runtime {
     /**
      * Signature: `fn difficulty(dest: *mut u8)`
      */
-    difficulty(dest) {
+    difficulty(dest: number) {
         this.writeU256Into(dest, this.ext.getEnvInfo().difficulty);
     }
 
     /**
      * Signature: `fn gaslimit(dest: *mut u8)`
      */
-    gaslimit(dest) {
+    gaslimit(dest: number) {
         this.writeU256Into(dest, this.ext.getEnvInfo().gasLimit);
     }
 
@@ -378,21 +393,21 @@ export class Runtime {
     /**
      * Signature: `fn address(dest: *mut u8)`
      */
-    address(dest) {
+    address(dest: number) {
         this.writeInto(dest, this.context.address);
     }
 
     /**
      * Signature: `sender(dest: *mut u8)`
      */
-    sender(dest) {
+    sender(dest: number) {
         this.writeInto(dest, this.context.sender);
     }
 
     /**
      * Signature: `origin(dest: *mut u8)`
      */
-    origin(dest) {
+    origin(dest: number) {
         this.writeInto(dest, this.context.origin);
     }
 }
