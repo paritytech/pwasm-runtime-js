@@ -24,7 +24,7 @@ export async function exec(
 
     // Charge for initial mem. TODO: schedule config
     runtime.charge(imports.memory.limits.initial * 4096);
-    const instance = await runtime.instantiate(await inject_gas(contract));
+    const instance = await runtime.instantiate(await inject_gas_counter(contract, ext.schedule()));
     // Call export
     instance.exports.call();
     // Return result from runtime
@@ -32,10 +32,6 @@ export async function exec(
         data: runtime.result,
         gasLeft: runtime.gasLeft().mul(ext.schedule().opcodes_mul).div(ext.schedule().opcodes_div)
     };
-}
-
-export async function inject_gas(module: ArrayBuffer): Promise<ArrayBuffer> {
-    return inject_gas_counter(module);
 }
 
 export { Runtime, RuntimeContext, Externalities, CALL_TYPE, H256, Address, inject_gas_counter };
