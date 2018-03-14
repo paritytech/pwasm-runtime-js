@@ -4,12 +4,15 @@ import { resolve } from 'path';
 import type { WasmSchedule } from './types';
 import TextEncoder from "text-encoding";
 
+let instance = null;
 /**
  * Returns gas counter to the module
  */
 export async function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSchedule): Promise<ArrayBuffer> {
     const injectorModuleBuf = fs.readFileSync(resolve(__dirname, "./wasm/gas_injector.wasm"));
-    const { instance } = await WebAssembly.instantiate(injectorModuleBuf);
+    if (!instance) {
+        instance = (await WebAssembly.instantiate(injectorModuleBuf)).instance;
+    }
     const contractBytes = new Uint8Array(contract);
 
     const scheduleString = JSON.stringify(schedule);
@@ -24,8 +27,10 @@ export async function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSc
 
     const resultDescPtr = instance.exports.inject_gas(contractPtr, contractBytes.byteLength, schedulePtr, scheduleBytes.byteLength);
     const resDesc = new Int32Array(instance.exports.memory.buffer, resultDescPtr, 2);
-    const result = new Uint8Array(instance.exports.memory.buffer, resDesc[0], resDesc[1]);
+    const result = new Uint8Array(instance.exports.memory.buffer, resDesc[0], resDesc[1]).slice();
+    instance.exports.dealloc(scheduleBytes.byteLength);
+    instance.exports.dealloc(contract.byteLength);
 
     // copy result and return buffer
-    return result.slice().buffer;
+    return result.buffer;
 }
