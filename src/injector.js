@@ -28,8 +28,8 @@ export async function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSc
     const resultDescPtr = instance.exports.inject_gas(contractPtr, contractBytes.byteLength, schedulePtr, scheduleBytes.byteLength);
     const resDesc = new Int32Array(instance.exports.memory.buffer, resultDescPtr, 2);
     const result = new Uint8Array(instance.exports.memory.buffer, resDesc[0], resDesc[1]).slice();
-    instance.exports.dealloc(scheduleBytes.byteLength);
-    instance.exports.dealloc(contract.byteLength);
+    instance.exports.dealloc(schedulePtr, scheduleBytes.byteLength);
+    instance.exports.dealloc(contractPtr, contract.byteLength);
 
     // copy result and return buffer
     return result.buffer;
