@@ -4,32 +4,6 @@ import Long from "long";
 import type { CallType } from "./externalities";
 import { bytesToHex, hexToBytes } from "./utils";
 
-export type Result = {
-    gasLeft: Long;
-    data: Uint8Array;
-}
-
-export type WasmSchedule = {
-    regular: number,
-    div: number,
-    mul: number,
-    mem: number,
-    static_u256: number,
-    static_address: number,
-    initial_mem: number,
-    grow_mem: number,
-    max_stack_height: number,
-    opcodes_mul: number,
-    opcodes_div: number,
-}
-
-export const PARAMS_TYPES = {
-    Embedded: (0:0),
-    Separate: (1:1),
-};
-
-type ParamsType = $Values<typeof PARAMS_TYPES>;
-
 export class ActionParams {
     code_address: Address;
     sender: Address;
@@ -129,3 +103,81 @@ export class Address extends FixedArray {
         return new Address(view);
     }
 }
+
+
+export type Result = {
+    gasLeft: Long;
+    data: Uint8Array;
+}
+
+export type Schedule = {
+    exceptional_failed_code_deposit: boolean,
+    have_delegate_call: boolean,
+    have_create2: boolean,
+    have_revert: boolean,
+    have_return_data: boolean,
+    stack_limit: number,
+    max_depth: number,
+    tier_step_gas: Array<number>,
+    exp_gas: number,
+    exp_byte_gas: number,
+    sha3_gas: number,
+    sha3_word_gas: number,
+    sload_gas: number,
+    sstore_set_gas: number,
+    sstore_reset_gas: number,
+    sstore_refund_gas: number,
+    jumpdest_gas: number,
+    log_gas: number,
+    log_data_gas: number,
+    log_topic_gas: number,
+    create_gas: number,
+    call_gas: number,
+    call_stipend: number,
+    call_value_transfer_gas: number,
+    call_new_account_gas: number,
+    suicide_refund_gas: number,
+    memory_gas: number,
+    quad_coeff_div: number,
+    create_data_gas: number,
+    create_data_limit: number,
+    tx_gas: number,
+    tx_create_gas: number,
+    tx_data_zero_gas: number,
+    tx_data_non_zero_gas: number,
+    copy_gas: number,
+    extcodesize_gas: number,
+    extcodecopy_base_gas: number,
+    balance_gas: number,
+    suicide_gas: number,
+    suicide_to_new_account_cost: number,
+    sub_gas_cap_divisor?: number,
+    no_empty: null,
+    kill_empty: null,
+    blockhash_gas: 20,
+    have_static_call: boolean,
+    kill_dust: null,
+    eip86: boolean,
+    wasm: WasmSchedule
+}
+
+export type WasmSchedule = {
+    regular: number,
+    div: number,
+    mul: number,
+    mem: number,
+    static_u256: number,
+    static_address: number,
+    initial_mem: number,
+    grow_mem: number,
+    max_stack_height: number,
+    opcodes_mul: number,
+    opcodes_div: number,
+}
+
+export const PARAMS_TYPES = {
+    Embedded: (0:0),
+    Separate: (1:1),
+};
+
+type ParamsType = $Values<typeof PARAMS_TYPES>;

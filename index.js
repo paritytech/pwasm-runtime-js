@@ -18,19 +18,19 @@ export async function exec(
     const imports = readImports(contract);
     const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
 
-    const adjustedGas = gasLimit.mul(ext.schedule().opcodes_div).div(ext.schedule().opcodes_mul);
+    const adjustedGas = gasLimit.mul(ext.schedule().wasm.opcodes_div).div(ext.schedule().wasm.opcodes_mul);
 
     const runtime = new Runtime(memory, ext, context, adjustedGas, args);
 
     // Charge for initial mem. TODO: schedule config
     runtime.charge(imports.memory.limits.initial * 4096);
-    const instance = await runtime.instantiate(await inject_gas_counter(contract, ext.schedule()));
+    const instance = await runtime.instantiate(await inject_gas_counter(contract, ext.schedule().wasm));
     // Call export
     instance.exports.call();
     // Return result from runtime
     return {
         data: runtime.result,
-        gasLeft: runtime.gasLeft().mul(ext.schedule().opcodes_mul).div(ext.schedule().opcodes_div)
+        gasLeft: runtime.gasLeft().mul(ext.schedule().wasm.opcodes_mul).div(ext.schedule().wasm.opcodes_div)
     };
 }
 
