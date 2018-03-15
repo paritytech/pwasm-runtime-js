@@ -81,11 +81,21 @@ export class Runtime {
         return this.gasLimit.sub(this.gasCounter);
     }
 
-    charge(amount: Long) {
+    charge(amount: Long | number) {
+        if (!(amount instanceof Long)) {
+            amount = Long.fromNumber(amount);
+        }
         this.gasCounter = this.gasCounter.add(amount);
         if (this.gasCounter.greaterThan(this.gasLimit)) {
             throw new Error("Out of gas");
         }
+    }
+
+    adjustedCharge(amount: Long | number) {
+        if (!(amount instanceof Long)) {
+            amount = Long.fromNumber(amount);
+        }
+        this.charge(amount.mul(this.ext.schedule().wasm.opcodes_div).div(this.ext.schedule().wasm.opcodes_mul));
     }
 
     async instantiate(contract: ArrayBuffer): Promise<Object> {
@@ -202,6 +212,7 @@ export class Runtime {
      * Read from the storage to wasm memory
      */
     storage_read(keyPtr: number, valPtr: number) {
+        this.adjustedCharge(this.ext.schedule().sload_gas);
         const value = this.ext.storageAt(this.viewH256At(keyPtr));
         this.writeInto(valPtr, value);
     }
@@ -210,7 +221,15 @@ export class Runtime {
      * Write to storage from wasm memory
      */
     storage_write(keyPtr: number, valPtr: number) {
-        this.ext.setStorage(this.viewH256At(keyPtr), this.viewH256At(valPtr));
+        const key = this.viewH256At(keyPtr);
+        const val = this.viewH256At(valPtr);
+        const formerVal = this.ext.storageAt(key);
+        if (formerVal.isZero() && !val.isZero()) {
+            this.adjustedCharge(this.ext.schedule().sstore_set_gas);
+        } else {
+            this.adjustedCharge(this.ext.schedule().sstore_reset_gas);
+        }
+        this.ext.setStorage(key, val);
     }
 
      /**
@@ -223,6 +242,8 @@ export class Runtime {
      * resultAddrPtr - pointer to write an address of the newly created contract
      */
     create(valuePtr: number, codePtr: number, codeLen: number, resultAddrPtr: number) {
+        this.adjustedCharge(this.ext.schedule().create_gas);
+        this.adjustedCharge(this.ext.schedule().create_data_gas * codeLen);
         const createResult = this.ext.create(new Long(), this.copyU256At(valuePtr), this.copyAt(codePtr, codeLen)) // TODO: gaslimit
     }
 
@@ -338,7 +359,13 @@ export class Runtime {
      * Pass suicide to state runtime
      */
     suicide(addrPtr: number) {
-        this.ext.suicide(this.viewAddressAt(addrPtr));
+        const refundAddr = this.viewAddressAt(addrPtr)
+        if (this.ext.exists(refundAddr)) {
+            this.adjustedCharge(this.ext.schedule().suicide_gas);
+        } else {
+            this.adjustedCharge(this.ext.schedule().suicide_to_new_account_cost);
+        }
+        this.ext.suicide(refundAddr);
     }
 
 
@@ -346,6 +373,7 @@ export class Runtime {
      * Signature: `fn coinbase(dest: *mut u8)`
      */
     coinbase(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_address);
         this.writeInto(dest, this.ext.getEnvInfo().author);
     }
 
@@ -353,6 +381,7 @@ export class Runtime {
      * Signature: `fn difficulty(dest: *mut u8)`
      */
     difficulty(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_u256);
         this.writeU256Into(dest, this.ext.getEnvInfo().difficulty);
     }
 
@@ -360,6 +389,7 @@ export class Runtime {
      * Signature: `fn gaslimit(dest: *mut u8)`
      */
     gaslimit(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_u256);
         this.writeU256Into(dest, this.ext.getEnvInfo().gasLimit);
     }
 
@@ -368,6 +398,7 @@ export class Runtime {
      */
 
     blockhash_u64(numberHI: number, numberLO: number, destPtr: number) {
+        this.adjustedCharge(this.ext.schedule().blockhash_gas);
         this.writeInto(destPtr,
             this.ext.blockhash(Long.fromBits(numberLO, numberHI)));
     }
@@ -394,6 +425,7 @@ export class Runtime {
      * Signature: `fn address(dest: *mut u8)`
      */
     address(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_address)
         this.writeInto(dest, this.context.address);
     }
 
@@ -401,6 +433,7 @@ export class Runtime {
      * Signature: `sender(dest: *mut u8)`
      */
     sender(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_address)
         this.writeInto(dest, this.context.sender);
     }
 
@@ -408,6 +441,7 @@ export class Runtime {
      * Signature: `origin(dest: *mut u8)`
      */
     origin(dest: number) {
+        this.charge(this.ext.schedule().wasm.static_address)
         this.writeInto(dest, this.context.origin);
     }
 }

@@ -56,6 +56,10 @@ export class FixedArray {
         return "0x" + bytesToHex(this.bytes);
     }
 
+    isZero(): boolean {
+        return this.bytes.every((b) => b === 0);
+    }
+
     static fromString(hex: string): FixedArray {
         return new FixedArray(Uint8Array.from(hexToBytes(hex)));
     }

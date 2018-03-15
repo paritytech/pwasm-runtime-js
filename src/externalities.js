@@ -1,6 +1,6 @@
 // @flow
 
-import type { WasmSchedule } from "./types";
+import type { Schedule } from "./types";
 import BigNumber from "bn.js";
 import Long from "long";
 import { H256, EnvInfo, Address } from "./types";
@@ -74,7 +74,7 @@ export class Externalities {
         this.logs = [];
     }
 
-    schedule(): WasmSchedule {
+    schedule(): Schedule {
         return schedule;
     }
 
@@ -104,7 +104,7 @@ export class Externalities {
         this.logs.push({topics, data});
     }
 
-    exists() {
+    exists(address: Address) {
         throw "not impl";
     }
 
