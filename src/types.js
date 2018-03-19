@@ -43,10 +43,6 @@ export class EnvInfo {
 export class FixedArray {
     bytes: Uint8Array;
 
-    constructor(bytes: Uint8Array) {
-        this.bytes = bytes;
-    }
-
     write(buf: ArrayBuffer, ptr: number) {
         let into = new Uint8Array(buf, ptr);
         into.set(this.bytes);
@@ -59,25 +55,21 @@ export class FixedArray {
     isZero(): boolean {
         return this.bytes.every((b) => b === 0);
     }
-
-    static fromString(hex: string): FixedArray {
-        return new FixedArray(Uint8Array.from(hexToBytes(hex)));
-    }
-
-    static copy(buffer: ArrayBuffer, offset: number): FixedArray {
-        const copied = new Uint8Array(buffer.slice(offset, offset + 32));
-        return new FixedArray(copied);
-    }
-
-    static view(buffer: ArrayBuffer, offset: number): FixedArray {
-        const view = new Uint8Array(buffer, offset, 32);
-        return new FixedArray(view);
-    }
 }
 
 export class H256 extends FixedArray {
-    static fromString(hex: string): FixedArray {
-        return new H256(Uint8Array.from(hexToBytes(hex)));
+
+    constructor(bytes: Uint8Array) {
+        super();
+        this.bytes = bytes;
+    }
+
+    static fromString(hex: string): H256 {
+        let bytes = new Uint8Array(32);
+        let origin = Uint8Array.from(hexToBytes(hex));
+        let startFrom = 32 - origin.byteLength;
+        bytes.set(origin, startFrom);
+        return new H256(bytes);
     }
 
     static copy(buffer: ArrayBuffer, offset: number): H256 {
@@ -92,6 +84,11 @@ export class H256 extends FixedArray {
 }
 
 export class Address extends FixedArray {
+
+    constructor(bytes: Uint8Array) {
+        super();
+        this.bytes = bytes;
+    }
 
     static fromString(hex: string): Address {
         return new Address(Uint8Array.from(hexToBytes(hex)));

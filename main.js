@@ -3,7 +3,7 @@
 import minimist from "minimist";
 import fs from "fs";
 import path from "path";
-import { exec, Externalities, RuntimeContext, Address } from "."
+import { exec, Externalities, RuntimeContext, Address, H256 } from "."
 import { bytesToHex, hexToBytes, toArrayBuffer } from "./src/utils";
 import Long from "long";
 
@@ -44,6 +44,7 @@ async function runTestFile(fileName): Promise<number> {
 
 async function runTest(test: {
     source: string,
+    storage?: Object,
     sender: string,
     payload?: string,
     gasLimit: number,
@@ -60,6 +61,12 @@ async function runTest(test: {
     if (typeof test.sender === "string") {
         context.withSender(Address.fromString(test.sender));
     }
+    if (typeof test.storage === "object") {
+        for (let [key, value] of Object.entries(test.storage)) {
+            // $FlowFixMe
+            ext.setStorage(H256.fromString(key), H256.fromString(value));
+        }
+    }
     const args  = hexToBytes(test.payload);
     context.withSender(Address.fromString(test.sender));
     const result = await exec(ext, toArrayBuffer(module), context, Long.fromNumber(test.gasLimit), args);
@@ -70,7 +77,7 @@ async function runTest(test: {
             for(let [i, call] of ext.getCalls().entries()) {
                 // $FlowFixMe
                 for(let prop of Object.getOwnPropertyNames(assert.HasCall)) {
-                    let callProp = {"sender": "senderAddress"}[prop] || prop;
+                    let callProp = {"sender": "senderAddress", "receiver": "receiveAddress"}[prop] || prop;
                     // $FlowFixMe
                     if (call[callProp].toString() !== assert.HasCall[prop]) {
 
