@@ -74,7 +74,7 @@ async function runTest(test: {
     if (typeof test.asserts === "object") {
                     // $FlowFixMe
         for (let [i, assert] of test.asserts.entries()) {
-            process.stdout.write("assert #" + (i + 1) + ".. ");
+            process.stdout.write("- assert #" + (i + 1) + ".. ");
             if (typeof assert.HasCall === "object") {
                 for(let [i, call] of ext.getCalls().entries()) {
                     // $FlowFixMe
@@ -88,6 +88,8 @@ async function runTest(test: {
                             process.stdout.write(`assert.HasCall.${prop} = ${assert.HasCall[prop].toString()}, but ext.getCalls().${i}.${prop} = ${call[callProp]}\n`);
 
                             failures++;
+                        } else {
+                            process.stdout.write("OK\n");
                         }
                     }
                 }
