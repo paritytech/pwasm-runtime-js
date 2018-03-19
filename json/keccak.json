@@ -23,7 +23,7 @@
         "payload": "0x20",
         "gasLimit": 100000,
         "asserts": [
-            { "Return": "681afa780d17da29203322b473d3f210a7d621259a4e6ce9e403f5a266ff719a" }
+            { "Return": "0x681afa780d17da29203322b473d3f210a7d621259a4e6ce9e403f5a266ff719a" }
         ]
     }
 ]

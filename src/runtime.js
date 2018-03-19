@@ -259,7 +259,7 @@ export class Runtime {
             resultLen: number): number {
         const resultRefArray = this.viewAt(resultPtr, resultLen);
         const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
-            this.context.address,
+            this.context.sender,
             this.copyAddressAt(addrPtr),
             this.copyU256At(valuePtr),
             this.copyAt(inputPtr, inputLen),
@@ -282,7 +282,7 @@ export class Runtime {
         resultLen: number): number {
         const resultRefArray = this.viewAt(resultPtr, resultLen);
         const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
-            this.context.address,
+            this.context.sender,
             this.copyAddressAt(addrPtr),
             null,
             this.copyAt(inputPtr, inputLen),
@@ -305,7 +305,7 @@ export class Runtime {
         resultLen: number): number {
         const resultRefArray = this.viewAt(resultPtr, resultLen);
         const callResult = this.ext.call(Long.fromBits(u64GasLo, u64GasHi),
-            this.context.address,
+            this.context.sender,
             this.copyAddressAt(addrPtr),
             null,
             this.copyAt(inputPtr, inputLen),

@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { exec, Externalities, RuntimeContext, Address } from "."
 import { bytesToHex, hexToBytes, toArrayBuffer } from "./src/utils";
+import Long from "long";
 
 try {
     (async function() {
@@ -45,8 +46,10 @@ async function runTest(test: {
     source: string,
     sender: string,
     payload?: string,
+    gasLimit: number,
     asserts: Array<{
-        Return?: string
+        Return?: string,
+        HasCall? : Object
     }>
 }): Promise<number> {
     const cwd = process.cwd();
@@ -54,17 +57,39 @@ async function runTest(test: {
     const module = fs.readFileSync(sourcePath);
     const ext = new Externalities();
     const context = RuntimeContext.default();
+    if (typeof test.sender === "string") {
+        context.withSender(Address.fromString(test.sender));
+    }
     const args  = hexToBytes(test.payload);
     context.withSender(Address.fromString(test.sender));
-    const result = await exec(ext, toArrayBuffer(module), context, args);
+    const result = await exec(ext, toArrayBuffer(module), context, Long.fromNumber(test.gasLimit), args);
     let failures = 0;
     for (let [i, assert] of test.asserts.entries()) {
         process.stdout.write("assert #" + (i + 1) + ".. ");
+        if (typeof assert.HasCall === "object") {
+            for(let [i, call] of ext.getCalls().entries()) {
+                // $FlowFixMe
+                for(let prop of Object.getOwnPropertyNames(assert.HasCall)) {
+                    let callProp = {"sender": "senderAddress"}[prop] || prop;
+                    // $FlowFixMe
+                    if (call[callProp].toString() !== assert.HasCall[prop]) {
+
+                        process.stdout.write("FAIL:");
+                        // $FlowFixMe
+                        process.stdout.write(`assert.HasCall.${prop} = ${assert.HasCall[prop].toString()}, but ext.getCalls().${i}.${prop} = ${call[callProp]}\n`);
+
+                        failures++;
+                    }
+                }
+            }
+        }
         if (assert.Return) {
-            if (("0x" + bytesToHex(result)) == assert.Return) {
+            if (("0x" + bytesToHex(result.data)) == assert.Return) {
                 process.stdout.write("OK\n");
             } else {
-                process.stdout.write("FAIL\n");
+                process.stdout.write("FAIL: ");
+                // $FlowFixMe
+                process.stdout.write(`assert.Return = ${assert.Return}, but result.data = ${"0x" + bytesToHex(result.data)}\n`);
                 failures++;
             }
         }

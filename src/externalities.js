@@ -143,4 +143,8 @@ export class Externalities {
     isStatic() {
         throw "not impl";
     }
+
+    getCalls() {
+        return this.calls;
+    }
 }
