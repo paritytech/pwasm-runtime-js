@@ -48,7 +48,7 @@ async function runTest(test: {
     sender: string,
     payload?: string,
     gasLimit: number,
-    asserts: Array<{
+    asserts?: Array<{
         Return?: string,
         HasCall? : Object
     }>
@@ -71,33 +71,36 @@ async function runTest(test: {
     context.withSender(Address.fromString(test.sender));
     const result = await exec(ext, toArrayBuffer(module), context, Long.fromNumber(test.gasLimit), args);
     let failures = 0;
-    for (let [i, assert] of test.asserts.entries()) {
-        process.stdout.write("assert #" + (i + 1) + ".. ");
-        if (typeof assert.HasCall === "object") {
-            for(let [i, call] of ext.getCalls().entries()) {
-                // $FlowFixMe
-                for(let prop of Object.getOwnPropertyNames(assert.HasCall)) {
-                    let callProp = {"sender": "senderAddress", "receiver": "receiveAddress"}[prop] || prop;
+    if (typeof test.asserts === "object") {
                     // $FlowFixMe
-                    if (call[callProp].toString() !== assert.HasCall[prop]) {
-
-                        process.stdout.write("FAIL:");
+        for (let [i, assert] of test.asserts.entries()) {
+            process.stdout.write("assert #" + (i + 1) + ".. ");
+            if (typeof assert.HasCall === "object") {
+                for(let [i, call] of ext.getCalls().entries()) {
+                    // $FlowFixMe
+                    for(let prop of Object.getOwnPropertyNames(assert.HasCall)) {
+                        let callProp = {"sender": "senderAddress", "receiver": "receiveAddress"}[prop] || prop;
                         // $FlowFixMe
-                        process.stdout.write(`assert.HasCall.${prop} = ${assert.HasCall[prop].toString()}, but ext.getCalls().${i}.${prop} = ${call[callProp]}\n`);
+                        if (call[callProp].toString() !== assert.HasCall[prop]) {
 
-                        failures++;
+                            process.stdout.write("FAIL:");
+                            // $FlowFixMe
+                            process.stdout.write(`assert.HasCall.${prop} = ${assert.HasCall[prop].toString()}, but ext.getCalls().${i}.${prop} = ${call[callProp]}\n`);
+
+                            failures++;
+                        }
                     }
                 }
             }
-        }
-        if (assert.Return) {
-            if (("0x" + bytesToHex(result.data)) == assert.Return) {
-                process.stdout.write("OK\n");
-            } else {
-                process.stdout.write("FAIL: ");
-                // $FlowFixMe
-                process.stdout.write(`assert.Return = ${assert.Return}, but result.data = ${"0x" + bytesToHex(result.data)}\n`);
-                failures++;
+            if (assert.Return) {
+                if (("0x" + bytesToHex(result.data)) == assert.Return) {
+                    process.stdout.write("OK\n");
+                } else {
+                    process.stdout.write("FAIL:");
+                    // $FlowFixMe
+                    process.stdout.write(`assert.Return = ${assert.Return}, but result.data = ${"0x" + bytesToHex(result.data)}\n`);
+                    failures++;
+                }
             }
         }
     }

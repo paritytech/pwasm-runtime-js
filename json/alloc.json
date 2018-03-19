@@ -1,0 +1,7 @@
+[
+    {
+        "caption": "Alloc",
+        "source": "./wasm-tests/compiled/alloc.wasm",
+        "gasLimit": 100000000
+    }
+]
