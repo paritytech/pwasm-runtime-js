@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/fckt/pwasm-js-runtime.git"
+    "url": "git+ssh://git@github.com/paritytech/pwasm-runtime-js.git"
   },
   "keywords": [
     "parity",
@@ -28,9 +28,9 @@
   "author": "Alexey Frolov <frol.rage@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fckt/pwasm-js-runtime/issues"
+    "url": "https://github.com/paritytech/pwasm-runtime-js/issues"
   },
-  "homepage": "https://github.com/fckt/pwasm-js-runtime#readme",
+  "homepage": "https://github.com/paritytech/pwasm-runtime-js",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
