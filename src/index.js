@@ -15,7 +15,7 @@ export async function exec(
     args: Uint8Array = new Uint8Array([])): Promise<Result> {
 
     const imports = readImports(contract);
-    const memory: Object = new global.WebAssembly.Memory(imports.memory.limits);
+    const memory = new WebAssembly.Memory(imports.memory.limits);
 
     const adjustedGas = gasLimit.mul(ext.schedule().wasm.opcodes_div).div(ext.schedule().wasm.opcodes_mul);
 
