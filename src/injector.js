@@ -10,7 +10,7 @@ let instance: ?WebAssembly$Instance = null;
  * Returns gas counter to the module
  */
 export async function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSchedule): Promise<ArrayBuffer> {
-    const injectorModuleBuf = fs.readFileSync(resolve(__dirname, "./wasm/gas_injector.wasm"));
+    const injectorModuleBuf = fs.readFileSync(resolve(__dirname, "../gas-injector/target/gas_injector.wasm"));
     if (!instance) {
         let inst = await WebAssembly.instantiate(injectorModuleBuf);
         instance = inst.instance;

@@ -101,7 +101,7 @@ export class Runtime {
         const imports = {};
 
         imports.memory = this.memory;
-        const proxy = fs.readFileSync(path.resolve(__dirname, "./wasm/proxy.wasm"));
+        const proxy = fs.readFileSync(path.resolve(__dirname, "../u64-proxy/proxy.wasm"));
         const {instance: proxyInstance} = await global.WebAssembly.instantiate(proxy, {env: {
             blockhash_u64: this.blockhash_u64.bind(this),
             timestamp_u64: this.timestamp_u64.bind(this),
