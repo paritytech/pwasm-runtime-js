@@ -1,11 +1,11 @@
 // @flow
 import Long from 'long';
-import type { ActionParams, Result } from './src/types';
-import { H256, Address } from './src/types';
-import { Externalities, CALL_TYPE } from './src/externalities';
-import { readImports } from "./src/utils";
-import { Runtime, RuntimeContext } from "./src/runtime";
-import { inject_gas_counter } from "./src/injector";
+import type { ActionParams, Result } from './types';
+import { H256, Address } from './types';
+import { Externalities, CALL_TYPE } from './externalities';
+import { readImports } from "./utils";
+import { Runtime, RuntimeContext } from "./runtime";
+import { inject_gas_counter } from "./injector";
 
 export async function exec(
     ext: Externalities,
