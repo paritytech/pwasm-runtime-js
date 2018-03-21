@@ -7,6 +7,9 @@ import { readImports } from "./utils";
 import { Runtime, RuntimeContext } from "./runtime";
 import { inject_gas_counter } from "./injector";
 
+/**
+ * The main exec function.
+ */
 export async function exec(
     ext: Externalities,
     contract: ArrayBuffer,
