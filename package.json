@@ -1,14 +1,14 @@
 {
   "name": "pwasm-runtime",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parity Wasm Javascript runtime",
   "main": "lib/index.js",
   "module": "src/index.js",
   "bin": {
-    "pwasm-test": "node ./lib/main.js"
+    "pwasm-test": "node lib/main.js"
   },
   "scripts": {
-    "pwasm-test": "node ./lib/main.js",
+    "pwasm-test": "node lib/main.js",
     "test": "jest",
     "flow": "flow",
     "build": "flow && babel src/ -d lib/",
