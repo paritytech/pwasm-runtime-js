@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Parity Wasm Javascript runtime",
   "main": "lib/index.js",
+  "module": "src/index.js",
   "bin": {
     "pwasm-test": "node ./lib/main.js"
   },
