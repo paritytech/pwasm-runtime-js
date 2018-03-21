@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 // @flow
 import minimist from "minimist";
 import fs from "fs";
