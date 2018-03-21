@@ -1,5 +1,4 @@
 // @flow
-
 import fs from 'fs';
 import Long from 'long';
 import BigNumber from 'bn.js';

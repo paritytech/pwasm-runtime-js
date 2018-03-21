@@ -1,17 +1,19 @@
+// @flow
 import fs from 'fs';
 import { resolve } from 'path';
 
 import type { WasmSchedule } from './types';
 import TextEncoder from "text-encoding";
 
-let instance = null;
+let instance: ?WebAssembly$Instance = null;
 /**
  * Returns gas counter to the module
  */
 export async function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSchedule): Promise<ArrayBuffer> {
     const injectorModuleBuf = fs.readFileSync(resolve(__dirname, "./wasm/gas_injector.wasm"));
     if (!instance) {
-        instance = (await WebAssembly.instantiate(injectorModuleBuf)).instance;
+        let inst = await WebAssembly.instantiate(injectorModuleBuf);
+        instance = inst.instance;
     }
     const contractBytes = new Uint8Array(contract);
 

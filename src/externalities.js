@@ -1,5 +1,4 @@
 // @flow
-
 import type { Schedule } from "./types";
 import BigNumber from "bn.js";
 import Long from "long";
@@ -115,21 +114,21 @@ export class Externalities {
     originBalance() {
         throw "not impl";
     }
-    balance(address) {
+    balance(address: Address) {
         throw "not impl";
     }
     blockhash(number: Long): H256 {
         return this.blockhashes.get(number.toString()) || new H256(new Uint8Array([]));
     }
-    extcode(address) {
+    extcode(address: Address) {
         throw "not impl";
     }
 
-    ret(gas, data, applyState) {
+    ret(gas: Long, data: Uint8Array, applyState: boolean) {
         throw "not impl";
     }
 
-    suicide(refundAddress) {
+    suicide(refundAddress: Address) {
         throw "not impl";
     }
 

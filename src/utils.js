@@ -1,3 +1,4 @@
+// @flow
 import { BinaryReader, BinaryReaderState, ExternalKind } from 'wasmparser';
 
 type Imports = {

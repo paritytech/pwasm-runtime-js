@@ -18,6 +18,16 @@ export class ActionParams {
     params_type: ParamsType;
 }
 
+type EnvInfoType = {
+    blocknumber: Long;
+    timestamp: Long;
+    author: Address;
+    difficulty: BigNumber;
+    gasLimit: BigNumber;
+    lastHashes: Array<H256>;
+    gasUsed: BigNumber;
+}
+
 export class EnvInfo {
     blocknumber: Long;
     timestamp: Long;
@@ -27,8 +37,18 @@ export class EnvInfo {
     lastHashes: Array<H256>;
     gasUsed: BigNumber;
 
+    constructor(info: EnvInfoType) {
+        this.blocknumber = info.blocknumber;
+        this.timestamp = info.timestamp;
+        this.author = info.author;
+        this.difficulty = info.difficulty;
+        this.gasLimit = info.gasLimit;
+        this.gasUsed = info.gasUsed;
+        this.lastHashes = info.lastHashes;
+    }
+
     static default() {
-        const env = new EnvInfo();
+        const env = {};
         env.blocknumber = Long.fromNumber(0);
         env.timestamp = Long.fromNumber(0);
         env.author = new Address(new Uint8Array([]));
@@ -36,7 +56,7 @@ export class EnvInfo {
         env.gasLimit = new BigNumber(0);
         env.gasUsed = new BigNumber(0);
         env.lastHashes = [];
-        return env;
+        return new EnvInfo(env);
     }
 }
 

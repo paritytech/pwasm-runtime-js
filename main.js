@@ -1,5 +1,4 @@
 // @flow
-
 import minimist from "minimist";
 import fs from "fs";
 import path from "path";
@@ -67,7 +66,7 @@ async function runTest(test: {
             ext.setStorage(H256.fromString(key), H256.fromString(value));
         }
     }
-    const args  = hexToBytes(test.payload);
+    const args  = hexToBytes(test.payload || "");
     context.withSender(Address.fromString(test.sender));
     const result = await exec(ext, toArrayBuffer(module), context, Long.fromNumber(test.gasLimit), args);
     let failures = 0;

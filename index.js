@@ -1,5 +1,4 @@
 // @flow
-
 import Long from 'long';
 import type { ActionParams, Result } from './src/types';
 import { H256, Address } from './src/types';

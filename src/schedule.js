@@ -1,3 +1,4 @@
+// @flow
 export default {
     exceptional_failed_code_deposit: true,
     have_delegate_call: true,
