@@ -10,7 +10,7 @@
     "pwasm-test": "node ./lib/main.js",
     "test": "jest",
     "flow": "flow",
-    "build": "babel src/ -d lib/",
+    "build": "flow && babel src/ -d lib/",
     "prepublish": "npm run build"
   },
   "repository": {
