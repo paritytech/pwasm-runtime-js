@@ -52,6 +52,7 @@ export default {
         div: 16,
         mul: 4,
         mem: 2,
+        memcpy: 1,
         static_u256: 64,
         static_address: 40,
         initial_mem: 4096,

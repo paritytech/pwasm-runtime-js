@@ -187,6 +187,7 @@ export type WasmSchedule = {
     div: number,
     mul: number,
     mem: number,
+    memcpy: number,
     static_u256: number,
     static_address: number,
     initial_mem: number,

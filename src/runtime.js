@@ -80,6 +80,7 @@ export class Runtime {
         return this.gasLimit.sub(this.gasCounter);
     }
 
+    /// Charge gas
     charge(amount: Long | number) {
         if (!(amount instanceof Long)) {
             amount = Long.fromNumber(amount);
@@ -90,6 +91,7 @@ export class Runtime {
         }
     }
 
+    /// Adjusted charge of gas which scales actual charge according to the wasm opcode counting coefficient
     adjustedCharge(amount: Long | number) {
         if (!(amount instanceof Long)) {
             amount = Long.fromNumber(amount);
@@ -194,7 +196,8 @@ export class Runtime {
      * Write input bytes to the memory location using the passed pointer
      */
     fetch_input(inputPtr: number) {
-        this.viewAt(inputPtr).set(this.args);
+        this.charge(this.args.byteLength * this.ext.schedule().wasm.memcpy);
+        this.viewAt(inputPtr, this.args.byteLength).set(this.args);
     }
 
     /**
