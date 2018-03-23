@@ -6,8 +6,8 @@ import BigNumber from 'bn.js';
 import { resolve } from 'path';
 
 import { exec, Externalities, RuntimeContext, CALL_TYPE, H256 } from ".";
-import { Address, EnvInfo } from './src/types';
-import { toArrayBuffer } from './src/utils';
+import { Address, EnvInfo } from './types';
+import { toArrayBuffer } from './utils';
 
 function readFileSync(path): ArrayBuffer {
     return toArrayBuffer(fs.readFileSync(resolve(path)));
