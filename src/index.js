@@ -26,7 +26,7 @@ export async function exec(
 
     // Charge for initial mem
     runtime.charge(imports.memory.limits.initial * 4096);
-    const instance = await runtime.instantiate(await inject_gas_counter(contract, ext.schedule().wasm));
+    const instance = await runtime.instantiate(inject_gas_counter(contract, ext.schedule().wasm));
     // Call export
     instance.exports.call();
     // Return result from runtime
