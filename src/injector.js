@@ -14,5 +14,5 @@ export function inject_gas_counter(contract: ArrayBuffer, schedule: WasmSchedule
     const scheduleBytes = new TextEncoder.TextEncoder('utf-8').encode(scheduleString);
 
     // copy result and return buffer
-    return inject_gas(new Uint8Array(contract), scheduleBytes);
+    return inject_gas(new Uint8Array(contract), scheduleBytes).buffer;
 }
