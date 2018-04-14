@@ -116,4 +116,10 @@ test('externs', async () => {
     // TODO: assert difficulty and gasLimit
 });
 
+test('alloc', async () => {
+    let wasm = readFileSync(resolve('./wasm-tests/compiled/alloc.wasm'));
+    let ext = new Externalities();
+    await exec(ext, wasm, RuntimeContext.default(), new Long(10000000));
+});
+
 
